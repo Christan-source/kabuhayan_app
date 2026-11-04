@@ -1,0 +1,890 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kabuhayan Connect</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- React & ReactDOM -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <!-- Babel for JSX -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            navy: '#0B1B36',
+                            blue: '#0056D2',
+                            light: '#F4F7FB',
+                            yellow: '#FFC107'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #F4F7FB; }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .modal-backdrop { background-color: rgba(11, 27, 54, 0.7); backdrop-filter: blur(4px); }
+        .chat-scroll::-webkit-scrollbar { width: 6px; }
+        .chat-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+
+        // --- EXPANDED MOCK DATABASE (10 ITEMS) ---
+        const mockOpportunities = [
+            { 
+                id: 1, 
+                title: "TESDA Free Skills Training (Computer Literacy)", 
+                provider: "TESDA", 
+                location: "Lipa City, Batangas", 
+                type: "Training", 
+                mode: "Free", 
+                image: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=500&q=80", 
+                description: "The TESDA Free Skills Training program offers computer literacy training for qualified individuals. This program aims to equip participants with basic computer skills, including MS Office, Internet use, and digital tools, to improve employability and support career growth.",
+                requirement: "Upload a valid ID and your latest Transcript of Records.",
+                requirementDetails: [
+                    "Must be 15 years old and above",
+                    "Must be a resident of Lipa City or nearby areas",
+                    "Valid ID (Philippine ID, Barangay ID, or School ID)",
+                    "Willing to attend the full training duration"
+                ],
+                deadline: "Oct 31, 2026"
+            },
+            { 
+                id: 2, 
+                title: "Small Business Grant (Start Your Own Business)", 
+                provider: "DTI", 
+                location: "Lipa City, Batangas", 
+                type: "Livelihood", 
+                mode: "Grant", 
+                image: "https://images.unsplash.com/photo-1556761175-5973dc0f32e7?w=500&q=80", 
+                description: "The Department of Trade and Industry (DTI) is offering a financial grant to help aspiring entrepreneurs start their own small businesses. The grant includes capital seed funding and mentorship sessions on business management.",
+                requirement: "Upload a 2-page business proposal.",
+                requirementDetails: [
+                    "Must be a Filipino citizen, 18 years old and above",
+                    "Not currently receiving other government grants",
+                    "Detailed 2-page business proposal",
+                    "Barangay clearance"
+                ],
+                deadline: "Oct 25, 2026"
+            },
+            { 
+                id: 3, 
+                title: "Job Hiring: Service Crew", 
+                provider: "SM Foundation", 
+                location: "Lipa City, Batangas", 
+                type: "Job", 
+                mode: "Full-time", 
+                image: "https://images.unsplash.com/photo-1552566626-52f8b828add9?w=500&q=80", 
+                description: "SM Foundation is looking for dedicated and customer-oriented individuals to join their team as Service Crew. Successful applicants will receive competitive compensation, health benefits, and opportunities for career advancement.",
+                requirement: "Upload your updated Resume/CV.",
+                requirementDetails: [
+                    "At least High School Graduate",
+                    "With or without experience (training will be provided)",
+                    "Excellent customer service skills",
+                    "Willing to work in shifting schedules"
+                ],
+                deadline: "Oct 20, 2026"
+            },
+            { 
+                id: 4, 
+                title: "Financial Literacy Seminar", 
+                provider: "Bangs Sentral ng Pilipinas", 
+                location: "Lipa City, Batangas", 
+                type: "Financial Literacy", 
+                mode: "Free", 
+                image: "https://images.unsplash.com/photo-1579621970588-a35d0e7ab9b6?w=500&q=80", 
+                description: "A comprehensive seminar designed to teach individuals how to manage their personal finances effectively. Topics include budgeting, saving, investing, and avoiding financial scams.",
+                requirement: "No documents needed. Just confirm your attendance.",
+                requirementDetails: [
+                    "Open to all residents of Batangas",
+                    "Must be able to attend the 4-hour seminar",
+                    "Bring a valid ID for registration on the day itself"
+                ],
+                deadline: "Oct 18, 2026"
+            },
+            { 
+                id: 5, 
+                title: "Job Hiring: Call Center Agent", 
+                provider: "TelePerformance", 
+                location: "Batangas City", 
+                type: "Job", 
+                mode: "Full-time", 
+                image: "https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=500&q=80", 
+                description: "Join our dynamic team as a Call Center Agent. You will handle customer inquiries, resolve issues, and provide excellent service. We offer a competitive salary, night differential, and HMO upon regularization.",
+                requirement: "Upload your updated Resume.",
+                requirementDetails: [
+                    "At least 18 years old",
+                    "High School Graduate or College Level",
+                    "Excellent English communication skills",
+                    "Willing to work on graveyard shifts"
+                ],
+                deadline: "Nov 15, 2026"
+            },
+            { 
+                id: 6, 
+                title: "Barista Training Program", 
+                provider: "TESDA", 
+                location: "Batangas City", 
+                type: "Training", 
+                mode: "Free", 
+                image: "https://images.unsplash.com/photo-1497935586351-b67a49e012bf?w=500&q=80", 
+                description: "Learn the art of coffee making! This 10-day training covers espresso preparation, latte art, customer service, and basic cafe management. Includes a National Certificate II (NC II) assessment.",
+                requirement: "Upload a valid ID.",
+                requirementDetails: [
+                    "Must be 18 years old and above",
+                    "With good communication skills",
+                    "Physically fit to stand for long hours",
+                    "Willing to undergo drug testing"
+                ],
+                deadline: "Nov 05, 2026"
+            },
+            { 
+                id: 7, 
+                title: "Micro-Financing for Sari-Sari Stores", 
+                provider: "CARD MRI", 
+                location: "Lipa City", 
+                type: "Livelihood", 
+                mode: "Loan", 
+                image: "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=500&q=80", 
+                description: "CARD MRI offers micro-financing loans specifically tailored for sari-sari store owners who want to expand their inventory or upgrade their store setup. Low interest rates and flexible payment terms.",
+                requirement: "Upload a Barangay Clearance and a photo of your store.",
+                requirementDetails: [
+                    "Must have an existing sari-sari store for at least 6 months",
+                    "Resident of the municipality for at least 1 year",
+                    "Barangay Clearance",
+                    "Valid ID"
+                ],
+                deadline: "Dec 01, 2026"
+            },
+            { 
+                id: 8, 
+                title: "Digital Marketing Basics Seminar", 
+                provider: "DTI", 
+                location: "Online (Zoom)", 
+                type: "Training", 
+                mode: "Free", 
+                image: "https://images.unsplash.com/photo-1432888622747-4eb9a8efeb07?w=500&q=80", 
+                description: "A 2-day online seminar teaching MSMEs how to use social media (Facebook, Instagram, TikTok) to market their products. Learn about content creation, basic ads, and engaging with customers online.",
+                requirement: "Upload a short paragraph about your business.",
+                requirementDetails: [
+                    "Must have a smartphone or laptop with internet access",
+                    "Must have a Facebook account",
+                    "Preference for existing micro-businesses",
+                    "Commitment to attend both days"
+                ],
+                deadline: "Oct 28, 2026"
+            },
+            { 
+                id: 9, 
+                title: "Job Hiring: Security Guard", 
+                provider: "AAA Security Agency", 
+                location: "Lipa City, Batangas", 
+                type: "Job", 
+                mode: "Full-time", 
+                image: "https://images.unsplash.com/photo-1542181741-24b800ca2d09?w=500&q=80", 
+                description: "We are looking for licensed security guards to maintain the safety and security of our commercial clients. Responsibilities include monitoring premises, controlling access, and responding to emergencies.",
+                requirement: "Upload your Security License (SOSIA).",
+                requirementDetails: [
+                    "Must have a valid Security Officer License",
+                    "At least 5'6\" in height",
+                    "Physically and mentally fit",
+                    "With NBI Clearance"
+                ],
+                deadline: "Nov 10, 2026"
+            },
+            { 
+                id: 10, 
+                title: "Stock Market and Investing 101", 
+                provider: "COL Financial", 
+                location: "Online (Webinar)", 
+                type: "Financial Literacy", 
+                mode: "Free", 
+                image: "https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?w=500&q=80", 
+                description: "Start your investing journey today. This free webinar explains the basics of the Philippine Stock Exchange, how to pick companies, and how to build a long-term investment portfolio.",
+                requirement: "Upload a valid Government ID.",
+                requirementDetails: [
+                    "Must be 18 years old and above",
+                    "Willing to open a COL Financial account after the webinar",
+                    "Have a stable source of income",
+                    "Valid Government ID"
+                ],
+                deadline: "Nov 20, 2026"
+            }
+        ];
+
+        // --- AUTHENTICATION COMPONENT ---
+        const AuthScreen = ({ onLogin }) => {
+            const [isLogin, setIsLogin] = useState(true);
+            const [error, setError] = useState('');
+            const [isLoading, setIsLoading] = useState(false);
+
+            const [formData, setFormData] = useState({
+                name: '', email: '', password: '', confirmPassword: '', phone: '', address: ''
+            });
+
+            const handleChange = (e) => {
+                setFormData({ ...formData, [e.target.name]: e.target.value });
+            };
+
+            const handleSubmit = (e) => {
+                e.preventDefault();
+                setError('');
+                setIsLoading(true);
+
+                setTimeout(() => {
+                    const existingUsers = JSON.parse(localStorage.getItem('kc_users') || '[]');
+
+                    if (isLogin) {
+                        const user = existingUsers.find(u => u.email === formData.email && u.password === formData.password);
+                        if (user) {
+                            onLogin(user);
+                        } else {
+                            setError('Invalid email or password. Please try again.');
+                            setIsLoading(false);
+                        }
+                    } else {
+                        if (formData.password !== formData.confirmPassword) {
+                            setError('Passwords do not match.');
+                            setIsLoading(false);
+                            return;
+                        }
+                        if (existingUsers.find(u => u.email === formData.email)) {
+                            setError('Email is already registered. Please log in.');
+                            setIsLoading(false);
+                            return;
+                        }
+
+                        const newUser = {
+                            id: Date.now().toString(),
+                            name: formData.name,
+                            email: formData.email,
+                            password: formData.password,
+                            phone: formData.phone,
+                            address: formData.address
+                        };
+
+                        existingUsers.push(newUser);
+                        localStorage.setItem('kc_users', JSON.stringify(existingUsers));
+                        onLogin(newUser);
+                    }
+                }, 800);
+            };
+
+            return (
+                <div className="min-h-screen flex bg-white">
+                    <div 
+                        className="hidden lg:flex w-1/2 flex-col justify-between p-12 relative overflow-hidden bg-cover bg-center"
+                        style={{ backgroundImage: "url('https://images.unsplash.com/photo-1573164713988-8665fc963095?q=80&w=2069&auto=format&fit=crop')" }}
+                    >
+                        <div className="absolute inset-0 bg-black/40 z-0"></div>
+                        <div className="z-10 relative mt-8">
+                            <div className="mb-8 inline-block bg-white rounded-xl overflow-hidden shadow-2xl border-4 border-white">
+                                <img src="logo.jpg" alt="Kabuhayan Connect Logo" className="w-56 h-auto object-contain" onError={(e) => { e.target.src = 'https://placehold.co/400x400/0056D2/white?text=Kabuhayan+Connect+Logo'; }} />
+                            </div>
+                            <h1 className="text-4xl font-bold text-white mb-4 drop-shadow-md">Find your next<br/>opportunity today.</h1>
+                        </div>
+                        <div className="z-10 relative mb-12">
+                            <p className="text-2xl text-white font-medium italic drop-shadow-lg">"Kakayahan mo,<br/>Kinabukasan mo!"</p>
+                        </div>
+                    </div>
+
+                    <div className="w-full lg:w-1/2 flex items-center justify-center p-8 overflow-y-auto max-h-screen">
+                        <div className="w-full max-w-md py-8">
+                            <h2 className="text-3xl font-bold text-gray-900 mb-2">{isLogin ? 'Welcome Back!' : 'Create an Account'}</h2>
+                            <p className="text-gray-500 mb-8">{isLogin ? 'Log in to your Kabuhayan Connect account.' : 'Join us to find opportunities.'}</p>
+                            
+                            {error && <div className="bg-red-50 text-red-600 p-3 rounded-lg mb-4 text-sm font-medium">{error}</div>}
+
+                            <form onSubmit={handleSubmit} className="space-y-4">
+                                {!isLogin && (
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+                                        <div className="relative">
+                                            <i data-lucide="user" className="absolute left-3 top-3 text-gray-400 w-5 h-5"></i>
+                                            <input type="text" name="name" required value={formData.name} onChange={handleChange} className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue outline-none" placeholder="Juan Dela Cruz" />
+                                        </div>
+                                    </div>
+                                )}
+
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
+                                    <div className="relative">
+                                        <i data-lucide="mail" className="absolute left-3 top-3 text-gray-400 w-5 h-5"></i>
+                                        <input type="email" name="email" required value={formData.email} onChange={handleChange} className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue outline-none" placeholder="juan@email.com" />
+                                    </div>
+                                </div>
+
+                                {!isLogin && (
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-1">Phone</label>
+                                            <div className="relative">
+                                                <i data-lucide="phone" className="absolute left-3 top-3 text-gray-400 w-5 h-5"></i>
+                                                <input type="text" name="phone" required value={formData.phone} onChange={handleChange} className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue outline-none" placeholder="+63 912..." />
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-1">Address</label>
+                                            <div className="relative">
+                                                <i data-lucide="map-pin" className="absolute left-3 top-3 text-gray-400 w-5 h-5"></i>
+                                                <input type="text" name="address" required value={formData.address} onChange={handleChange} className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue outline-none" placeholder="City, Province" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                                    <div className="relative">
+                                        <i data-lucide="lock" className="absolute left-3 top-3 text-gray-400 w-5 h-5"></i>
+                                        <input type="password" name="password" required value={formData.password} onChange={handleChange} className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue outline-none" placeholder="••••••••" />
+                                    </div>
+                                </div>
+
+                                {!isLogin && (
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">Confirm Password</label>
+                                        <div className="relative">
+                                            <i data-lucide="shield-check" className="absolute left-3 top-3 text-gray-400 w-5 h-5"></i>
+                                            <input type="password" name="confirmPassword" required value={formData.confirmPassword} onChange={handleChange} className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue outline-none" placeholder="••••••••" />
+                                        </div>
+                                    </div>
+                                )}
+
+                                <button type="submit" disabled={isLoading} className="w-full bg-brand-blue text-white py-3 rounded-lg font-bold text-lg hover:bg-blue-700 transition-colors shadow-sm mt-6 disabled:opacity-70">
+                                    {isLoading ? 'Processing...' : (isLogin ? 'Log In' : 'Sign Up')}
+                                </button>
+                            </form>
+                            
+                            <div className="mt-6 text-center">
+                                <p className="text-sm text-gray-500">
+                                    {isLogin ? "Don't have an account? " : "Already have an account? "}
+                                    <button onClick={() => { setIsLogin(!isLogin); setError(''); }} className="text-brand-blue font-bold hover:underline">
+                                        {isLogin ? 'Sign Up' : 'Log In'}
+                                    </button>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        // --- SIDEBAR ---
+        const Sidebar = ({ currentView, setView }) => {
+            const menuItems = [
+                { id: 'dashboard', name: 'Dashboard', icon: 'layout-dashboard' },
+                { id: 'opportunities', name: 'Opportunities', icon: 'briefcase' },
+                { id: 'training', name: 'Training & Seminars', icon: 'book-open' },
+                { id: 'business', name: 'Small Business Resources', icon: 'store' },
+                { id: 'financial', name: 'Financial Literacy', icon: 'wallet' },
+                { id: 'messages', name: 'Messages', icon: 'message-square' },
+                { id: 'profile', name: 'Profile', icon: 'user' },
+            ];
+
+            return (
+                <div className="w-64 bg-brand-navy text-white flex flex-col h-screen fixed left-0 top-0 overflow-y-auto hide-scrollbar z-20">
+                    <div className="p-6 flex justify-center border-b border-white/10">
+                        <img src="logo.jpg" alt="Kabuhayan Connect Logo" className="w-full max-w-[160px] h-auto object-contain rounded-lg shadow-sm" onError={(e) => { e.target.src = 'https://placehold.co/200x200/0056D2/white?text=Logo'; }} />
+                    </div>
+                    
+                    <nav className="mt-4 flex-1">
+                        {menuItems.map((item) => (
+                            <button 
+                                key={item.id}
+                                onClick={() => setView(item.id)}
+                                className={`w-full flex items-center gap-3 px-6 py-3 text-sm font-medium transition-colors ${currentView === item.id ? 'bg-brand-blue border-l-4 border-white' : 'text-gray-300 hover:bg-white/10'}`}
+                            >
+                                <i data-lucide={item.icon} className="w-5 h-5"></i>
+                                {item.name}
+                            </button>
+                        ))}
+                    </nav>
+
+                    <div className="p-4 border-t border-white/10">
+                        <button onClick={() => { localStorage.removeItem('kc_session'); window.location.reload(); }} className="flex items-center gap-3 px-4 py-2 text-sm text-red-300 hover:text-white hover:bg-white/10 rounded-lg w-full transition-colors">
+                            <i data-lucide="log-out" className="w-5 h-5"></i> Log Out
+                        </button>
+                    </div>
+                </div>
+            );
+        };
+
+        const Topbar = ({ user }) => {
+            return (
+                <div className="h-20 bg-white border-b flex items-center justify-between px-8 fixed top-0 right-0 left-64 z-10">
+                    <div className="flex items-center bg-gray-100 rounded-full px-4 py-2 w-96">
+                        <i data-lucide="search" className="text-gray-400 w-5 h-5 mr-2"></i>
+                        <input type="text" placeholder="Search opportunities..." className="bg-transparent border-none outline-none text-sm w-full" />
+                    </div>
+                    <div className="flex items-center gap-6">
+                        <button className="relative text-gray-500 hover:text-gray-800">
+                            <i data-lucide="bell" className="w-6 h-6"></i>
+                            <span className="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full"></span>
+                        </button>
+                        <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 bg-brand-blue text-white rounded-full flex items-center justify-center font-bold uppercase">
+                                {user.name.charAt(0)}
+                            </div>
+                            <div className="text-sm">
+                                <p className="font-semibold text-gray-800">{user.name}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        // --- UPLOAD REQUIREMENT MODAL ---
+        const OpportunityDetailModal = ({ opportunity, onClose, onSubmit }) => {
+            const [step, setStep] = useState(1);
+            const [fileName, setFileName] = useState('');
+            const [isSubmitting, setIsSubmitting] = useState(false);
+
+            const handleFileChange = (e) => {
+                if(e.target.files.length > 0) setFileName(e.target.files[0].name);
+            };
+
+            const handleSubmit = (e) => {
+                e.preventDefault();
+                if(!fileName) return alert("Please attach the required document.");
+                setIsSubmitting(true);
+                setTimeout(() => {
+                    onSubmit(opportunity);
+                    setIsSubmitting(false);
+                }, 1000);
+            };
+
+            return (
+                <div className="fixed inset-0 z-50 flex items-center justify-center modal-backdrop p-4">
+                    <div className="bg-white rounded-2xl w-full max-w-2xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
+                        
+                        {/* Header */}
+                        <div className="bg-brand-blue p-6 text-white relative shrink-0">
+                            <button onClick={onClose} className="absolute top-4 right-4 text-white/80 hover:text-white"><i data-lucide="x" className="w-6 h-6"></i></button>
+                            <span className="text-xs font-bold uppercase tracking-wider bg-blue-700/50 px-2 py-1 rounded-md mb-2 inline-block">
+                                {opportunity.type}
+                            </span>
+                            <h3 className="text-2xl font-bold mb-1 leading-tight">{opportunity.title}</h3>
+                            <p className="text-blue-100 flex items-center gap-2"><i data-lucide="building" className="w-4 h-4"></i> {opportunity.provider}</p>
+                        </div>
+
+                        {/* Scrollable Content Area */}
+                        <div className="p-6 overflow-y-auto flex-1 chat-scroll">
+                            
+                            {step === 1 && (
+                                <div className="space-y-6">
+                                    <img src={opportunity.image} alt={opportunity.title} className="w-full h-48 object-cover rounded-xl" />
+                                    
+                                    <div className="grid grid-cols-2 gap-4 bg-gray-50 p-4 rounded-xl border border-gray-100">
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center shrink-0"><i data-lucide="map-pin" className="w-4 h-4"></i></div>
+                                            <div>
+                                                <p className="text-xs text-gray-500">Location</p>
+                                                <p className="text-sm font-semibold text-gray-900">{opportunity.location}</p>
+                                            </div>
+                                        </div>
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-8 h-8 rounded-full bg-red-100 text-red-600 flex items-center justify-center shrink-0"><i data-lucide="calendar" className="w-4 h-4"></i></div>
+                                            <div>
+                                                <p className="text-xs text-gray-500">Deadline</p>
+                                                <p className="text-sm font-semibold text-gray-900">{opportunity.deadline}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <h4 className="text-lg font-bold text-gray-900 mb-2">About This Program</h4>
+                                        <p className="text-sm text-gray-600 leading-relaxed">{opportunity.description}</p>
+                                    </div>
+
+                                    <div className="bg-yellow-50 border border-yellow-200 p-5 rounded-xl">
+                                        <h4 className="text-md font-bold text-yellow-800 mb-3 flex items-center gap-2">
+                                            <i data-lucide="clipboard-list" className="w-5 h-5"></i> Requirements
+                                        </h4>
+                                        <ul className="space-y-2">
+                                            {opportunity.requirementDetails.map((req, index) => (
+                                                <li key={index} className="text-sm text-yellow-800 flex items-start gap-2">
+                                                    <i data-lucide="check-circle" className="w-4 h-4 mt-0.5 shrink-0"></i>
+                                                    <span>{req}</span>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                </div>
+                            )}
+
+                            {step === 2 && (
+                                <div>
+                                    <div className="bg-blue-50 border border-blue-100 p-4 rounded-lg mb-6">
+                                        <p className="text-sm text-blue-800 font-medium">
+                                            You are applying for: <br/> <span className="font-bold">{opportunity.title}</span>
+                                        </p>
+                                    </div>
+
+                                    <div className="mb-6">
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                                            Upload Document <span className="text-red-500">*</span>
+                                        </label>
+                                        <p className="text-xs text-gray-500 mb-3">Specifically required: {opportunity.requirement}</p>
+                                        
+                                        <div className={`border-2 border-dashed rounded-xl p-8 text-center transition-colors relative cursor-pointer ${fileName ? 'border-green-400 bg-green-50' : 'border-gray-300 hover:bg-gray-50'}`}>
+                                            <input type="file" onChange={handleFileChange} className="absolute inset-0 w-full h-full opacity-0 cursor-pointer" accept=".pdf,.doc,.docx,.jpg,.png" />
+                                            <i data-lucide={fileName ? "file-check" : "upload-cloud"} className={`w-10 h-10 mx-auto mb-3 ${fileName ? 'text-green-500' : 'text-gray-400'}`}></i>
+                                            <p className={`text-sm font-medium ${fileName ? 'text-green-700' : 'text-gray-600'}`}>
+                                                {fileName ? fileName : "Click to browse or drag and drop your file"}
+                                            </p>
+                                            <p className="text-xs text-gray-400 mt-1">PDF, Word, or Image (Max 5MB)</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Footer Actions */}
+                        <div className="p-6 border-t bg-gray-50 flex gap-3 justify-between shrink-0">
+                            {step === 1 ? (
+                                <>
+                                    <button type="button" onClick={onClose} className="px-5 py-2.5 rounded-lg font-medium text-gray-600 hover:bg-gray-200 transition-colors">Close</button>
+                                    <button type="button" onClick={() => setStep(2)} className="px-6 py-2.5 rounded-lg font-bold text-white bg-brand-blue hover:bg-blue-700 transition-colors flex items-center gap-2">
+                                        Proceed to Apply <i data-lucide="arrow-right" className="w-4 h-4"></i>
+                                    </button>
+                                </>
+                            ) : (
+                                <>
+                                    <button type="button" onClick={() => setStep(1)} className="px-5 py-2.5 rounded-lg font-medium text-gray-600 hover:bg-gray-200 transition-colors flex items-center gap-2">
+                                        <i data-lucide="arrow-left" className="w-4 h-4"></i> Back
+                                    </button>
+                                    <button onClick={handleSubmit} disabled={isSubmitting || !fileName} className="px-6 py-2.5 rounded-lg font-bold text-white bg-brand-blue hover:bg-blue-700 transition-colors flex items-center gap-2 disabled:opacity-50">
+                                        {isSubmitting ? 'Submitting...' : 'Submit Application'}
+                                    </button>
+                                </>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        const DashboardView = ({ onApply, user }) => {
+            const firstName = user.name.split(' ')[0]; 
+            return (
+                <div className="p-8 max-w-7xl mx-auto pt-28">
+                    <div className="mb-8">
+                        <h2 className="text-2xl font-bold text-gray-900">Good morning, {firstName}!</h2>
+                        <p className="text-gray-500">Here are some opportunities and resources just for you.</p>
+                    </div>
+
+                    <div className="bg-blue-600 rounded-2xl p-8 text-white flex justify-between items-center mb-8 relative overflow-hidden">
+                        <div className="z-10 max-w-lg">
+                            <h3 className="text-3xl font-bold mb-4">Build your skills.<br/>Find opportunities.<br/>Create a better tomorrow.</h3>
+                            <button className="bg-brand-yellow text-gray-900 font-bold py-2 px-6 rounded-lg hover:bg-yellow-500 transition-colors">Explore Opportunities</button>
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-4 gap-6 mb-10">
+                        {[
+                            { label: 'Job Opportunities', count: 3, icon: 'briefcase', color: 'text-blue-500', bg: 'bg-blue-50' },
+                            { label: 'Livelihood Programs', count: 2, icon: 'store', color: 'text-green-500', bg: 'bg-green-50' },
+                            { label: 'Training & Seminars', count: 3, icon: 'book-open', color: 'text-purple-500', bg: 'bg-purple-50' },
+                            { label: 'Financial Literacy', count: 2, icon: 'wallet', color: 'text-yellow-500', bg: 'bg-yellow-50' },
+                        ].map((stat, i) => (
+                            <div key={i} className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex items-center gap-4">
+                                <div className={`w-12 h-12 rounded-full flex items-center justify-center ${stat.bg} ${stat.color}`}>
+                                    <i data-lucide={stat.icon} className="w-6 h-6"></i>
+                                </div>
+                                <div>
+                                    <p className="text-sm text-gray-500">{stat.label}</p>
+                                    <p className="text-2xl font-bold text-gray-900">{stat.count}</p>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+
+                    <div className="flex justify-between items-center mb-4">
+                        <h3 className="text-lg font-bold text-gray-900">Featured Opportunities</h3>
+                    </div>
+                    <div className="grid grid-cols-4 gap-6">
+                        {mockOpportunities.slice(0, 4).map(opp => (
+                            <OpportunityCard key={opp.id} opp={opp} onApply={onApply} />
+                        ))}
+                    </div>
+                </div>
+            );
+        };
+
+        const OpportunityCard = ({ opp, onApply }) => (
+            <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow flex flex-col">
+                <img src={opp.image} alt={opp.title} className="w-full h-32 object-cover" />
+                <div className="p-4 flex-1 flex flex-col">
+                    <h4 className="font-bold text-sm text-gray-900 mb-1 line-clamp-2">{opp.title}</h4>
+                    <p className="text-xs text-gray-500 mb-2 flex items-center gap-1"><i data-lucide="building" className="w-3 h-3"></i> {opp.provider}</p>
+                    <p className="text-xs text-gray-500 mb-4 flex items-center gap-1"><i data-lucide="map-pin" className="w-3 h-3"></i> {opp.location}</p>
+                    <div className="mt-auto flex gap-2 mb-3">
+                        <span className="text-[10px] bg-gray-100 text-gray-600 px-2 py-1 rounded-full">{opp.type}</span>
+                        <span className="text-[10px] bg-green-50 text-green-600 px-2 py-1 rounded-full">{opp.mode}</span>
+                    </div>
+                    <button onClick={() => onApply(opp)} className="w-full bg-brand-blue text-white text-sm py-2 rounded-lg font-medium hover:bg-blue-700">Apply Now</button>
+                </div>
+            </div>
+        );
+
+        const FilteredOpportunitiesView = ({ filterType, title, subtitle, onApply }) => {
+            const filtered = mockOpportunities.filter(o => o.type === filterType || filterType === 'All');
+            
+            return (
+                <div className="p-8 max-w-7xl mx-auto pt-28">
+                    <div className="mb-8">
+                        <h2 className="text-2xl font-bold text-gray-900">{title}</h2>
+                        <p className="text-gray-500">{subtitle}</p>
+                    </div>
+                    {filtered.length === 0 ? (
+                        <div className="bg-white p-12 rounded-xl text-center border border-gray-100">
+                            <i data-lucide="inbox" className="w-12 h-12 text-gray-300 mx-auto mb-3"></i>
+                            <h3 className="text-lg font-bold text-gray-800">No items found</h3>
+                            <p className="text-gray-500">Check back later for updates.</p>
+                        </div>
+                    ) : (
+                        <div className="grid grid-cols-3 gap-6">
+                            {filtered.map(opp => <OpportunityCard key={opp.id} opp={opp} onApply={onApply} />)}
+                        </div>
+                    )}
+                </div>
+            );
+        };
+
+        const MessagesView = () => {
+            const [messages, setMessages] = useState([
+                { id: 1, sender: 'bot', text: "Kumusta! I am your Kabuhayan Assistant. How can I help you today? You can ask me about 'Jobs', 'TESDA', 'Grants', or type 'Help'." }
+            ]);
+            const [input, setInput] = useState('');
+            const [isTyping, setIsTyping] = useState(false);
+            const chatEndRef = useRef(null);
+
+            useEffect(() => {
+                chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+            }, [messages, isTyping]);
+
+            const handleSend = (e) => {
+                e.preventDefault();
+                if (!input.trim()) return;
+
+                const userMsg = { id: Date.now(), sender: 'user', text: input };
+                setMessages(prev => [...prev, userMsg]);
+                setInput('');
+                setIsTyping(true);
+
+                setTimeout(() => {
+                    const lowerInput = userMsg.text.toLowerCase();
+                    let botResponse = "I'm not sure about that. Try asking about 'Jobs', 'Training', 'Grants', or type 'Help'.";
+
+                    if (lowerInput.includes('job') || lowerInput.includes('work') || lowerInput.includes('hiring')) {
+                        botResponse = "We currently have Job Openings like 'Service Crew', 'Call Center Agent', and 'Security Guard'. Check the Opportunities tab!";
+                    } else if (lowerInput.includes('tesda') || lowerInput.includes('training') || lowerInput.includes('skill')) {
+                        botResponse = "TESDA offers free Computer Literacy and Barista training! Check the 'Training & Seminars' tab to apply.";
+                    } else if (lowerInput.includes('grant') || lowerInput.includes('business') || lowerInput.includes('negosyo')) {
+                        botResponse = "DTI is offering a Small Business Grant, and CARD MRI has micro-financing for Sari-Sari stores. Go to 'Small Business Resources' to see the requirements.";
+                    } else if (lowerInput.includes('help') || lowerInput.includes('hi') || lowerInput.includes('hello')) {
+                        botResponse = "Hello! I can guide you to Jobs, Trainings, or Livelihood grants. What are you looking for today?";
+                    }
+
+                    setMessages(prev => [...prev, { id: Date.now() + 1, sender: 'bot', text: botResponse }]);
+                    setIsTyping(false);
+                }, 1500);
+            };
+
+            return (
+                <div className="p-8 max-w-4xl mx-auto pt-28 h-[calc(100vh-2rem)] flex flex-col">
+                    <div className="mb-6">
+                        <h2 className="text-2xl font-bold text-gray-900">Messages</h2>
+                        <p className="text-gray-500">Chat with the Kabuhayan Assistant.</p>
+                    </div>
+
+                    <div className="bg-white rounded-xl shadow-sm border border-gray-100 flex-1 flex flex-col overflow-hidden mb-4">
+                        <div className="bg-gray-50 border-b p-4 flex items-center gap-3">
+                            <div className="w-10 h-10 bg-brand-blue rounded-full flex items-center justify-center text-white">
+                                <i data-lucide="bot" className="w-6 h-6"></i>
+                            </div>
+                            <div>
+                                <h3 className="font-bold text-gray-900">Kabuhayan Assistant</h3>
+                                <p className="text-xs text-green-600 flex items-center gap-1"><span className="w-2 h-2 bg-green-500 rounded-full"></span> Online</p>
+                            </div>
+                        </div>
+
+                        <div className="flex-1 overflow-y-auto p-6 space-y-4 chat-scroll bg-gray-50/50">
+                            {messages.map(msg => (
+                                <div key={msg.id} className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
+                                    <div className={`max-w-[75%] p-3 rounded-2xl text-sm ${msg.sender === 'user' ? 'bg-brand-blue text-white rounded-tr-sm' : 'bg-white border border-gray-200 text-gray-800 rounded-tl-sm shadow-sm'}`}>
+                                        {msg.text}
+                                    </div>
+                                </div>
+                            ))}
+                            {isTyping && (
+                                <div className="flex justify-start">
+                                    <div className="bg-white border border-gray-200 p-3 rounded-2xl rounded-tl-sm shadow-sm flex gap-1">
+                                        <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></span>
+                                        <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></span>
+                                        <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.4s' }}></span>
+                                    </div>
+                                </div>
+                            )}
+                            <div ref={chatEndRef} />
+                        </div>
+
+                        <form onSubmit={handleSend} className="p-4 border-t bg-white flex gap-3">
+                            <input type="text" value={input} onChange={e => setInput(e.target.value)} placeholder="Type a message..." className="flex-1 bg-gray-100 border-none outline-none rounded-full px-4 py-3 text-sm focus:ring-2 focus:ring-brand-blue" />
+                            <button type="submit" className="bg-brand-blue text-white w-12 h-12 rounded-full flex items-center justify-center hover:bg-blue-700 transition-colors shadow-sm">
+                                <i data-lucide="send" className="w-5 h-5 ml-1"></i>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            );
+        };
+
+        const ProfileView = ({ user, applications }) => {
+            return (
+                <div className="p-8 max-w-7xl mx-auto pt-28">
+                     <h2 className="text-2xl font-bold text-gray-900 mb-6">My Profile</h2>
+                     <div className="grid grid-cols-12 gap-6">
+                        <div className="col-span-3">
+                            <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex flex-col items-center text-center">
+                                <div className="w-24 h-24 bg-brand-blue text-white rounded-full flex items-center justify-center text-3xl font-bold mb-4 uppercase">
+                                    {user.name.charAt(0)}
+                                </div>
+                                <h3 className="font-bold text-lg text-gray-900">{user.name}</h3>
+                                <p className="text-sm text-gray-500 mb-4">{user.email}</p>
+                            </div>
+                        </div>
+                        <div className="col-span-5">
+                            <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                                <h3 className="font-bold text-gray-900 mb-6">Personal Information</h3>
+                                <div className="space-y-4 text-sm">
+                                    <div><p className="text-gray-500 text-xs mb-1">Full Name</p><p className="font-medium text-gray-900">{user.name}</p></div>
+                                    <div><p className="text-gray-500 text-xs mb-1">Email</p><p className="font-medium text-gray-900">{user.email}</p></div>
+                                    <div><p className="text-gray-500 text-xs mb-1">Phone</p><p className="font-medium text-gray-900">{user.phone}</p></div>
+                                    <div><p className="text-gray-500 text-xs mb-1">Address</p><p className="font-medium text-gray-900">{user.address}</p></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="col-span-4">
+                             <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                                <h3 className="font-bold text-gray-900 mb-6">Application Status</h3>
+                                <div className="space-y-4">
+                                    {applications.length === 0 ? (
+                                        <p className="text-sm text-gray-500 text-center py-4">No applications yet.</p>
+                                    ) : (
+                                        applications.map((app, i) => (
+                                            <div key={i} className="flex items-center justify-between p-3 border border-gray-50 rounded-lg bg-gray-50/50">
+                                                <div className="flex items-center gap-3">
+                                                    <div className="w-10 h-10 bg-white rounded-md border border-gray-100 flex items-center justify-center">
+                                                        <i data-lucide="file-check" className="w-5 h-5 text-brand-blue"></i>
+                                                    </div>
+                                                    <div>
+                                                        <p className="text-sm font-medium text-gray-900 line-clamp-1">{app.title}</p>
+                                                        <p className="text-xs text-gray-500">Applied on {app.date}</p>
+                                                    </div>
+                                                </div>
+                                                <span className={`text-[10px] font-bold px-2 py-1 rounded-full whitespace-nowrap bg-yellow-100 text-yellow-700`}>
+                                                    {app.status}
+                                                </span>
+                                            </div>
+                                        ))
+                                    )}
+                                </div>
+                             </div>
+                        </div>
+                     </div>
+                </div>
+            );
+        };
+
+
+        // --- MAIN APP COMPONENT ---
+        const App = () => {
+            const [user, setUser] = useState(null);
+            const [currentView, setCurrentView] = useState('dashboard');
+            const [applications, setApplications] = useState([]);
+            const [selectedOpp, setSelectedOpp] = useState(null);
+
+            useEffect(() => {
+                const savedUser = localStorage.getItem('kc_session');
+                if (savedUser) setUser(JSON.parse(savedUser));
+            }, []);
+
+            useEffect(() => {
+                lucide.createIcons();
+            });
+
+            const handleLogin = (userData) => {
+                setUser(userData);
+                localStorage.setItem('kc_session', JSON.stringify(userData));
+            };
+
+            const handleApplySubmit = (opportunity) => {
+                const newApp = {
+                    id: Date.now(),
+                    title: opportunity.title,
+                    status: 'Under Review',
+                    date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+                };
+                setApplications([newApp, ...applications]);
+                setSelectedOpp(null);
+                alert(`Successfully applied for: ${opportunity.title}`);
+                setCurrentView('profile'); 
+            };
+
+            if (!user) return <AuthScreen onLogin={handleLogin} />;
+
+            const renderView = () => {
+                switch(currentView) {
+                    case 'dashboard': return <DashboardView onApply={setSelectedOpp} user={user} />;
+                    case 'opportunities': return <FilteredOpportunitiesView filterType="All" title="All Opportunities" subtitle="Find the best opportunities for your skills and goals." onApply={setSelectedOpp} />;
+                    case 'training': return <FilteredOpportunitiesView filterType="Training" title="Training & Seminars" subtitle="Upgrade your skills with these free programs." onApply={setSelectedOpp} />;
+                    case 'business': return <FilteredOpportunitiesView filterType="Livelihood" title="Small Business Resources" subtitle="Grants and loans to start or grow your negosyo." onApply={setSelectedOpp} />;
+                    case 'financial': return <FilteredOpportunitiesView filterType="Financial Literacy" title="Financial Literacy" subtitle="Learn how to manage your money better." onApply={setSelectedOpp} />;
+                    case 'messages': return <MessagesView />;
+                    case 'profile': return <ProfileView user={user} applications={applications} />;
+                    default: return <DashboardView onApply={setSelectedOpp} user={user} />;
+                }
+            }
+
+            return (
+                <div className="min-h-screen bg-brand-light">
+                    <Sidebar currentView={currentView} setView={setCurrentView} />
+                    <div className="ml-64">
+                        <Topbar user={user} />
+                        {renderView()}
+                    </div>
+
+                    {selectedOpp && (
+                        <OpportunityDetailModal 
+                            opportunity={selectedOpp} 
+                            onClose={() => setSelectedOpp(null)} 
+                            onSubmit={handleApplySubmit} 
+                        />
+                    )}
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
