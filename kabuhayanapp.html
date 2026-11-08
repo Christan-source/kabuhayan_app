@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -103,7 +104,7 @@
             { 
                 id: 4, 
                 title: "Financial Literacy Seminar", 
-                provider: "Bangs Sentral ng Pilipinas", 
+                provider: "Bangko Sentral ng Pilipinas", 
                 location: "Lipa City, Batangas", 
                 type: "Financial Literacy", 
                 mode: "Free", 
@@ -227,6 +228,385 @@
             }
         ];
 
+        // --- EXTRA DETAILS + REQUIRED DOCUMENTS (shown after "Proceed to Apply") ---
+        // NOTE: this is sample content. Replace the values with the real info from each provider.
+        // `documents` = one upload slot per item. An empty list means "no documents needed" (e.g. seminars).
+        const OPPORTUNITY_EXTRAS = {
+            1: {
+                details: [
+                    { icon: "timer", label: "Duration", value: "2 weeks (Monday to Friday)" },
+                    { icon: "clock", label: "Schedule", value: "8:00 AM – 12:00 NN" },
+                    { icon: "map-pin", label: "Venue", value: "TESDA training center, Lipa City" },
+                    { icon: "users", label: "Available slots", value: "30 participants" },
+                    { icon: "award", label: "You will receive", value: "Certificate of Completion" },
+                    { icon: "banknote", label: "Cost", value: "Free (materials provided)" }
+                ],
+                highlightsTitle: "What you'll learn",
+                highlights: [
+                    "MS Word, Excel and PowerPoint basics",
+                    "Using the internet, email and online forms",
+                    "Online safety and spotting scams",
+                    "Digital tools like Google Docs and Zoom"
+                ],
+                process: [
+                    "Upload your Valid ID and Transcript of Records",
+                    "TESDA reviews your documents (3–5 working days)",
+                    "You get a confirmation in your notifications",
+                    "Attend the orientation on the first day of training"
+                ],
+                documents: [
+                    { id: "valid-id", label: "Valid ID", hint: "Philippine ID, Barangay ID, or School ID", required: true },
+                    { id: "tor", label: "Transcript of Records", hint: "Your latest TOR or report card", required: true }
+                ]
+            },
+            2: {
+                details: [
+                    { icon: "banknote", label: "Grant amount", value: "Up to ₱20,000 seed capital" },
+                    { icon: "graduation-cap", label: "Mentorship", value: "4 business management sessions" },
+                    { icon: "map-pin", label: "Coverage", value: "Lipa City, Batangas" },
+                    { icon: "users", label: "Who can apply", value: "Filipino citizens, 18 years old and above" },
+                    { icon: "calendar", label: "Proposal review", value: "About 2–3 weeks after the deadline" },
+                    { icon: "gift", label: "Cost to apply", value: "Free" }
+                ],
+                highlightsTitle: "What the grant includes",
+                highlights: [
+                    "Seed funding to start your business",
+                    "Business mentoring sessions with DTI",
+                    "Guidance on registering your business name",
+                    "Access to the DTI Negosyo Center network"
+                ],
+                process: [
+                    "Upload your business proposal and Barangay Clearance",
+                    "DTI screens all proposals",
+                    "Shortlisted applicants are invited for a short interview",
+                    "Results are sent to you, then grant release and mentoring begin"
+                ],
+                documents: [
+                    { id: "proposal", label: "Business Proposal (2 pages)", hint: "Describe your business idea, target customers and how you will use the funds", required: true, accept: ["pdf", "doc", "docx"] },
+                    { id: "barangay-clearance", label: "Barangay Clearance", hint: "Issued by your barangay within the last 6 months", required: true }
+                ]
+            },
+            3: {
+                details: [
+                    { icon: "banknote", label: "Salary", value: "₱14,000 – ₱16,000 per month" },
+                    { icon: "briefcase", label: "Employment", value: "Full-time, shifting schedule" },
+                    { icon: "map-pin", label: "Work location", value: "Lipa City, Batangas" },
+                    { icon: "users", label: "Openings", value: "12 positions" },
+                    { icon: "gift", label: "Benefits", value: "SSS, PhilHealth, Pag-IBIG, 13th month pay" },
+                    { icon: "graduation-cap", label: "Experience", value: "Not required. Training provided" }
+                ],
+                highlightsTitle: "Job responsibilities",
+                highlights: [
+                    "Greet and assist customers",
+                    "Handle cash and POS transactions",
+                    "Keep the store clean and organized",
+                    "Follow food safety and store policies"
+                ],
+                process: [
+                    "Upload your updated resume",
+                    "HR screens applications",
+                    "Interview and short skills assessment",
+                    "Job offer and pre-employment requirements"
+                ],
+                documents: [
+                    { id: "resume", label: "Resume / CV", hint: "Updated, with your contact number and email", required: true, accept: ["pdf", "doc", "docx"] },
+                    { id: "diploma", label: "Diploma or Form 137", hint: "Proof of high school graduation", required: false }
+                ]
+            },
+            4: {
+                details: [
+                    { icon: "timer", label: "Duration", value: "4 hours" },
+                    { icon: "clock", label: "Schedule", value: "9:00 AM – 1:00 PM" },
+                    { icon: "map-pin", label: "Venue", value: "Lipa City (exact venue sent after confirmation)" },
+                    { icon: "users", label: "Available slots", value: "100 participants" },
+                    { icon: "award", label: "You will receive", value: "Certificate of Attendance" },
+                    { icon: "banknote", label: "Cost", value: "Free" }
+                ],
+                highlightsTitle: "Topics covered",
+                highlights: [
+                    "Budgeting and saving",
+                    "Basics of investing",
+                    "Spotting and avoiding financial scams",
+                    "Using digital banking safely"
+                ],
+                process: [
+                    "Confirm your attendance below",
+                    "You receive a confirmation and the venue details",
+                    "Bring a valid ID on the day of the seminar",
+                    "Register at the venue and attend the seminar"
+                ],
+                documents: []
+            },
+            5: {
+                details: [
+                    { icon: "banknote", label: "Salary", value: "₱18,000 – ₱24,000 per month + incentives" },
+                    { icon: "clock", label: "Schedule", value: "Graveyard shift (night differential)" },
+                    { icon: "map-pin", label: "Work location", value: "Batangas City" },
+                    { icon: "users", label: "Openings", value: "20 positions" },
+                    { icon: "gift", label: "Benefits", value: "HMO, night differential, paid leaves, 13th month pay" },
+                    { icon: "graduation-cap", label: "Experience", value: "Entry-level applicants welcome" }
+                ],
+                highlightsTitle: "Job responsibilities",
+                highlights: [
+                    "Handle customer calls and chats",
+                    "Resolve concerns and process requests",
+                    "Follow call quality guidelines",
+                    "Meet performance and service targets"
+                ],
+                process: [
+                    "Upload your resume and school records",
+                    "Online English assessment",
+                    "HR interview",
+                    "Operations interview, then job offer"
+                ],
+                documents: [
+                    { id: "resume", label: "Resume / CV", hint: "Updated, with your contact number and email", required: true, accept: ["pdf", "doc", "docx"] },
+                    { id: "school-records", label: "Diploma or school records", hint: "High school diploma, or proof of college level (e.g. grades)", required: true }
+                ]
+            },
+            6: {
+                details: [
+                    { icon: "timer", label: "Duration", value: "10 days" },
+                    { icon: "clock", label: "Schedule", value: "1:00 PM – 5:00 PM" },
+                    { icon: "map-pin", label: "Venue", value: "TESDA training center, Batangas City" },
+                    { icon: "users", label: "Available slots", value: "25 participants" },
+                    { icon: "award", label: "You will receive", value: "NC II assessment and certificate" },
+                    { icon: "banknote", label: "Cost", value: "Free" }
+                ],
+                highlightsTitle: "What you'll learn",
+                highlights: [
+                    "Espresso preparation and milk steaming",
+                    "Latte art",
+                    "Customer service skills",
+                    "Cafe opening, closing and basic inventory"
+                ],
+                process: [
+                    "Upload your valid ID",
+                    "TESDA screens applicants and schedules the drug test",
+                    "Attend the orientation",
+                    "Complete the training and take the NC II assessment"
+                ],
+                documents: [
+                    { id: "valid-id", label: "Valid ID", hint: "Philippine ID, Barangay ID, or School ID", required: true }
+                ]
+            },
+            7: {
+                details: [
+                    { icon: "banknote", label: "Loan amount", value: "₱5,000 – ₱30,000" },
+                    { icon: "calendar", label: "Loan term", value: "6 to 12 months" },
+                    { icon: "clock", label: "Payments", value: "Flexible weekly or monthly" },
+                    { icon: "percent", label: "Interest", value: "Low interest (rate shown during assessment)" },
+                    { icon: "map-pin", label: "Coverage", value: "Lipa City" },
+                    { icon: "timer", label: "Release", value: "Within about 7 days after approval" }
+                ],
+                highlightsTitle: "What you can use the loan for",
+                highlights: [
+                    "Buying more inventory",
+                    "Upgrading shelves, signage or a refrigerator",
+                    "Adding new products or services"
+                ],
+                process: [
+                    "Upload your Barangay Clearance, store photo and valid ID",
+                    "A loan officer visits your store",
+                    "Loan assessment and approval",
+                    "Loan signing and release"
+                ],
+                documents: [
+                    { id: "barangay-clearance", label: "Barangay Clearance", hint: "Issued by your barangay within the last 6 months", required: true },
+                    { id: "store-photo", label: "Photo of your sari-sari store", hint: "A clear photo showing the storefront and your shelves", required: true, accept: ["jpg", "jpeg", "png"] },
+                    { id: "valid-id", label: "Valid ID", hint: "Philippine ID, Barangay ID, or Driver's License", required: true }
+                ]
+            },
+            8: {
+                details: [
+                    { icon: "timer", label: "Duration", value: "2 days (online)" },
+                    { icon: "clock", label: "Schedule", value: "9:00 AM – 12:00 NN each day" },
+                    { icon: "video", label: "Platform", value: "Zoom (link sent after approval)" },
+                    { icon: "users", label: "Available slots", value: "50 participants" },
+                    { icon: "award", label: "You will receive", value: "e-Certificate" },
+                    { icon: "banknote", label: "Cost", value: "Free" }
+                ],
+                highlightsTitle: "Topics covered",
+                highlights: [
+                    "Setting up a Facebook Page and Instagram account",
+                    "Creating photos and videos using your phone",
+                    "Basic ads and boosting posts",
+                    "Talking to customers through messages and comments"
+                ],
+                process: [
+                    "Upload a short paragraph about your business",
+                    "DTI confirms your slot",
+                    "You receive the Zoom link and seminar guide",
+                    "Attend both days of the seminar"
+                ],
+                documents: [
+                    { id: "business-paragraph", label: "Short paragraph about your business", hint: "A few sentences: what you sell, who your customers are, and where you operate", required: true, accept: ["pdf", "doc", "docx"] }
+                ]
+            },
+            9: {
+                details: [
+                    { icon: "banknote", label: "Salary", value: "₱16,000 – ₱18,000 per month" },
+                    { icon: "clock", label: "Schedule", value: "12-hour rotating shifts" },
+                    { icon: "map-pin", label: "Work location", value: "Lipa City, Batangas" },
+                    { icon: "users", label: "Openings", value: "15 positions" },
+                    { icon: "gift", label: "Benefits", value: "SSS, PhilHealth, Pag-IBIG, uniform, 13th month pay" },
+                    { icon: "badge-check", label: "Must have", value: "Valid Security Officer License" }
+                ],
+                highlightsTitle: "Job responsibilities",
+                highlights: [
+                    "Monitor the premises and CCTV",
+                    "Control access and check visitor IDs",
+                    "Conduct regular patrols",
+                    "Write incident reports and respond to emergencies"
+                ],
+                process: [
+                    "Upload your security license and NBI Clearance",
+                    "Document verification",
+                    "Interview and physical assessment",
+                    "Deployment to a client site"
+                ],
+                documents: [
+                    { id: "sosia", label: "Security License (SOSIA)", hint: "Must be valid and not expired", required: true },
+                    { id: "nbi", label: "NBI Clearance", hint: "Issued within the last 6 months", required: true }
+                ]
+            },
+            10: {
+                details: [
+                    { icon: "timer", label: "Duration", value: "2 hours" },
+                    { icon: "clock", label: "Schedule", value: "7:00 PM – 9:00 PM" },
+                    { icon: "video", label: "Platform", value: "Online webinar (link sent after approval)" },
+                    { icon: "users", label: "Available slots", value: "200 participants" },
+                    { icon: "award", label: "You will receive", value: "Certificate of Attendance" },
+                    { icon: "banknote", label: "Cost", value: "Free" }
+                ],
+                highlightsTitle: "Topics covered",
+                highlights: [
+                    "How the Philippine Stock Exchange works",
+                    "How to pick companies to invest in",
+                    "Building a long-term portfolio",
+                    "Understanding investment risks"
+                ],
+                process: [
+                    "Upload a valid government ID",
+                    "Your registration is verified",
+                    "You receive the webinar link",
+                    "Join the webinar and the live Q&A"
+                ],
+                documents: [
+                    { id: "gov-id", label: "Valid Government ID", hint: "Philippine ID, Driver's License, Passport, UMID, etc.", required: true }
+                ]
+            }
+        };
+        mockOpportunities.forEach(o => Object.assign(o, OPPORTUNITY_EXTRAS[o.id] || {}));
+
+        // --- SMALL HELPERS (icons, search, notifications) ---
+        // Wrapping the lucide <i> in a keyed <span> keeps React and lucide.createIcons() from fighting
+        // over the same DOM node when dropdowns open/close.
+        const Icon = ({ name, className }) => (
+            <span key={name} className="inline-flex shrink-0">
+                <i data-lucide={name} className={className}></i>
+            </span>
+        );
+
+        // Multi-word search: every word must appear somewhere in the opportunity. Title matches rank first.
+        const searchOpportunities = (query) => {
+            const tokens = query.toLowerCase().split(/\s+/).filter(Boolean);
+            if (tokens.length === 0) return [];
+            return mockOpportunities
+                .map(o => {
+                    const title = o.title.toLowerCase();
+                    const haystack = [o.title, o.provider, o.location, o.type, o.mode, o.description].join(' ').toLowerCase();
+                    return {
+                        o,
+                        match: tokens.every(t => haystack.includes(t)),
+                        titleHits: tokens.filter(t => title.includes(t)).length
+                    };
+                })
+                .filter(r => r.match)
+                .sort((a, b) => b.titleHits - a.titleHits)
+                .map(r => r.o);
+        };
+
+        const Highlight = ({ text, query }) => {
+            const tokens = query.trim().split(/\s+/).filter(Boolean)
+                .map(t => t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+            if (tokens.length === 0) return <>{text}</>;
+            const parts = text.split(new RegExp(`(${tokens.join('|')})`, 'gi'));
+            return (
+                <>
+                    {parts.map((p, i) => i % 2 === 1
+                        ? <mark key={i} className="bg-yellow-200 text-gray-900 rounded px-0.5">{p}</mark>
+                        : <React.Fragment key={i}>{p}</React.Fragment>)}
+                </>
+            );
+        };
+
+        const QUICK_SEARCHES = ['Job', 'Training', 'Livelihood', 'Free', 'Online', 'TESDA', 'DTI'];
+
+        const timeAgo = (ts) => {
+            const s = Math.floor((Date.now() - ts) / 1000);
+            if (s < 60) return 'Just now';
+            const m = Math.floor(s / 60);
+            if (m < 60) return `${m} min ago`;
+            const h = Math.floor(m / 60);
+            if (h < 24) return `${h} hr ago`;
+            const d = Math.floor(h / 24);
+            return `${d} day${d > 1 ? 's' : ''} ago`;
+        };
+
+        const NOTIF_STYLES = {
+            urgent:      { icon: 'alarm-clock', bg: 'bg-red-100',   text: 'text-red-600' },
+            deadline:    { icon: 'clock',       bg: 'bg-amber-100', text: 'text-amber-600' },
+            application: { icon: 'file-check',  bg: 'bg-green-100', text: 'text-green-600' },
+            info:        { icon: 'sparkles',    bg: 'bg-blue-100',  text: 'text-brand-blue' },
+        };
+
+        // Notifications are a mix of:
+        //  - "closing soon" reminders, computed from each opportunity's deadline (within 14 days, not yet applied)
+        //  - events saved when the user does something (e.g. submits an application)
+        //  - a one-time welcome message
+        // `state` = { custom: [...], read: [ids], dismissed: [ids] } and is saved per user in localStorage.
+        const buildNotifications = (state, appliedTitles) => {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            const reminders = [];
+            mockOpportunities.forEach(o => {
+                if (appliedTitles.includes(o.title)) return;
+                const d = new Date(o.deadline);
+                if (isNaN(d)) return;
+                d.setHours(0, 0, 0, 0);
+                const days = Math.round((d - today) / 86400000);
+                if (days >= 0 && days <= 14) {
+                    reminders.push({
+                        id: `deadline-${o.id}`,
+                        type: days <= 3 ? 'urgent' : 'deadline',
+                        title: days === 0 ? 'Closes today!' : days === 1 ? 'Closes tomorrow!' : `Closes in ${days} days`,
+                        body: `${o.title} (${o.provider})`,
+                        meta: `Deadline: ${o.deadline}`,
+                        oppId: o.id,
+                        order: days
+                    });
+                }
+            });
+            reminders.sort((a, b) => a.order - b.order);
+
+            const custom = state.custom.map(n => ({ ...n, meta: timeAgo(n.ts) }));
+
+            const welcome = {
+                id: 'welcome',
+                type: 'info',
+                title: 'Welcome to Kabuhayan Connect!',
+                body: 'Browse jobs, trainings and livelihood programs, then apply by uploading your documents.',
+                meta: 'Getting started',
+                view: 'opportunities'
+            };
+
+            return [...custom, ...reminders, welcome]
+                .filter(n => !state.dismissed.includes(n.id))
+                .map(n => ({ ...n, read: state.read.includes(n.id) }));
+        };
+
         // --- AUTHENTICATION COMPONENT ---
         const AuthScreen = ({ onLogin }) => {
             const [isLogin, setIsLogin] = useState(true);
@@ -289,9 +669,9 @@
                 <div className="min-h-screen flex bg-white">
                     <div 
                         className="hidden lg:flex w-1/2 flex-col justify-between p-12 relative overflow-hidden bg-cover bg-center"
-                        style={{ backgroundImage: "url('https://images.unsplash.com/photo-1573164713988-8665fc963095?q=80&w=2069&auto=format&fit=crop')" }}
+                        style={{ backgroundColor: '#0B1B36', backgroundImage: "url('https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=2069&auto=format&fit=crop')" }}
                     >
-                        <div className="absolute inset-0 bg-black/40 z-0"></div>
+                        <div className="absolute inset-0 bg-gradient-to-r from-brand-navy/85 via-brand-navy/60 to-brand-navy/30 z-0"></div>
                         <div className="z-10 relative mt-8">
                             <div className="mb-8 inline-block bg-white rounded-xl overflow-hidden shadow-2xl border-4 border-white">
                                 <img src="logo.jpg" alt="Kabuhayan Connect Logo" className="w-56 h-auto object-contain" onError={(e) => { e.target.src = 'https://placehold.co/400x400/0056D2/white?text=Kabuhayan+Connect+Logo'; }} />
@@ -425,18 +805,274 @@
             );
         };
 
-        const Topbar = ({ user }) => {
+        const Topbar = ({
+            user, query, onQueryChange, onSearchSubmit, onSelectOpp, hideSuggestions,
+            notifications, unreadCount, onNotifClick, onMarkAllRead, onClearAll, onDismissNotif
+        }) => {
+            const [searchOpen, setSearchOpen] = useState(false);
+            const [notifOpen, setNotifOpen] = useState(false);
+            const [notifTab, setNotifTab] = useState('all');
+            const [activeIndex, setActiveIndex] = useState(-1);
+            const searchRef = useRef(null);
+            const notifRef = useRef(null);
+            const inputRef = useRef(null);
+
+            // Topbar re-renders on its own (open/close, typing), so refresh the lucide icons here too.
+            useEffect(() => { lucide.createIcons(); });
+
+            // Close dropdowns on outside click / Escape.
+            useEffect(() => {
+                const onMouseDown = (e) => {
+                    if (searchRef.current && !searchRef.current.contains(e.target)) setSearchOpen(false);
+                    if (notifRef.current && !notifRef.current.contains(e.target)) setNotifOpen(false);
+                };
+                const onKeyDown = (e) => {
+                    if (e.key === 'Escape') { setSearchOpen(false); setNotifOpen(false); }
+                };
+                document.addEventListener('mousedown', onMouseDown);
+                document.addEventListener('keydown', onKeyDown);
+                return () => {
+                    document.removeEventListener('mousedown', onMouseDown);
+                    document.removeEventListener('keydown', onKeyDown);
+                };
+            }, []);
+
+            // ---- Search ----
+            const trimmed = query.trim();
+            const results = trimmed ? searchOpportunities(query) : [];
+            const suggestions = results.slice(0, 5);
+            const showDropdown = searchOpen && !hideSuggestions;
+
+            const submitSearch = () => {
+                if (!trimmed) return;
+                setSearchOpen(false);
+                if (inputRef.current) inputRef.current.blur();
+                onSearchSubmit();
+            };
+
+            const pickResult = (opp) => {
+                setSearchOpen(false);
+                if (inputRef.current) inputRef.current.blur();
+                onSelectOpp(opp);
+            };
+
+            const handleSearchKeyDown = (e) => {
+                if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    setActiveIndex(i => Math.min(i + 1, suggestions.length - 1));
+                } else if (e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    setActiveIndex(i => Math.max(i - 1, -1));
+                } else if (e.key === 'Enter') {
+                    e.preventDefault();
+                    if (activeIndex >= 0 && suggestions[activeIndex]) pickResult(suggestions[activeIndex]);
+                    else submitSearch();
+                }
+            };
+
+            const runQuickSearch = (term) => {
+                onQueryChange(term);
+                setSearchOpen(false);
+                onSearchSubmit();
+            };
+
+            // ---- Notifications ----
+            const visibleNotifs = notifTab === 'unread' ? notifications.filter(n => !n.read) : notifications;
+
             return (
                 <div className="h-20 bg-white border-b flex items-center justify-between px-8 fixed top-0 right-0 left-64 z-10">
-                    <div className="flex items-center bg-gray-100 rounded-full px-4 py-2 w-96">
-                        <i data-lucide="search" className="text-gray-400 w-5 h-5 mr-2"></i>
-                        <input type="text" placeholder="Search opportunities..." className="bg-transparent border-none outline-none text-sm w-full" />
+                    {/* Search */}
+                    <div ref={searchRef} className="relative w-96">
+                        <div className="flex items-center bg-gray-100 rounded-full px-4 py-2 focus-within:ring-2 focus-within:ring-brand-blue/40">
+                            <Icon name="search" className="text-gray-400 w-5 h-5 mr-2" />
+                            <input
+                                ref={inputRef}
+                                type="text"
+                                value={query}
+                                onChange={(e) => { onQueryChange(e.target.value); setActiveIndex(-1); setSearchOpen(true); setNotifOpen(false); }}
+                                onFocus={() => { setSearchOpen(true); setNotifOpen(false); }}
+                                onKeyDown={handleSearchKeyDown}
+                                placeholder="Search opportunities..."
+                                aria-label="Search opportunities"
+                                className="bg-transparent border-none outline-none text-sm w-full"
+                            />
+                            {query && (
+                                <button
+                                    type="button"
+                                    onClick={() => { onQueryChange(''); setActiveIndex(-1); if (inputRef.current) inputRef.current.focus(); }}
+                                    aria-label="Clear search"
+                                    className="text-gray-400 hover:text-gray-700 ml-2"
+                                >
+                                    <Icon name="x" className="w-4 h-4" />
+                                </button>
+                            )}
+                        </div>
+
+                        {showDropdown && (
+                            <div className="absolute left-0 top-full mt-2 w-[32rem] max-w-[calc(100vw-20rem)] bg-white rounded-xl shadow-xl border border-gray-100 overflow-hidden z-30">
+                                {!trimmed ? (
+                                    <div className="p-4">
+                                        <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-3">Popular searches</p>
+                                        <div className="flex flex-wrap gap-2">
+                                            {QUICK_SEARCHES.map(term => (
+                                                <button
+                                                    key={term}
+                                                    type="button"
+                                                    onClick={() => runQuickSearch(term)}
+                                                    className="text-sm bg-gray-100 hover:bg-blue-50 hover:text-brand-blue text-gray-700 px-3 py-1.5 rounded-full transition-colors"
+                                                >
+                                                    {term}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+                                ) : results.length === 0 ? (
+                                    <div className="p-6 text-center">
+                                        <Icon name="search-x" className="w-8 h-8 text-gray-300 mx-auto mb-2" />
+                                        <p className="text-sm font-semibold text-gray-800">No results for "{trimmed}"</p>
+                                        <p className="text-xs text-gray-500 mt-1">Try a job title, a provider like TESDA, or a place like Lipa.</p>
+                                    </div>
+                                ) : (
+                                    <>
+                                        <div className="max-h-96 overflow-y-auto chat-scroll">
+                                            {suggestions.map((opp, idx) => (
+                                                <button
+                                                    key={opp.id}
+                                                    type="button"
+                                                    onMouseEnter={() => setActiveIndex(idx)}
+                                                    onClick={() => pickResult(opp)}
+                                                    className={`w-full flex items-center gap-3 px-4 py-3 text-left transition-colors ${idx === activeIndex ? 'bg-blue-50' : 'hover:bg-gray-50'}`}
+                                                >
+                                                    <img src={opp.image} alt="" className="w-11 h-11 rounded-lg object-cover shrink-0 bg-gray-100" />
+                                                    <div className="min-w-0 flex-1">
+                                                        <p className="text-sm font-semibold text-gray-900 truncate"><Highlight text={opp.title} query={query} /></p>
+                                                        <p className="text-xs text-gray-500 truncate"><Highlight text={`${opp.provider} \u00B7 ${opp.location}`} query={query} /></p>
+                                                    </div>
+                                                    <span className="text-[10px] bg-gray-100 text-gray-600 px-2 py-1 rounded-full shrink-0">{opp.type}</span>
+                                                </button>
+                                            ))}
+                                        </div>
+                                        <button
+                                            type="button"
+                                            onClick={submitSearch}
+                                            className="w-full flex items-center justify-between px-4 py-3 text-sm font-semibold text-brand-blue bg-gray-50 border-t hover:bg-blue-50 transition-colors"
+                                        >
+                                            <span>See all {results.length} result{results.length > 1 ? 's' : ''} for "{trimmed}"</span>
+                                            <Icon name="arrow-right" className="w-4 h-4" />
+                                        </button>
+                                    </>
+                                )}
+                            </div>
+                        )}
                     </div>
+
                     <div className="flex items-center gap-6">
-                        <button className="relative text-gray-500 hover:text-gray-800">
-                            <i data-lucide="bell" className="w-6 h-6"></i>
-                            <span className="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full"></span>
-                        </button>
+                        {/* Notification bell */}
+                        <div ref={notifRef} className="relative">
+                            <button
+                                type="button"
+                                onClick={() => { setNotifOpen(o => !o); setSearchOpen(false); }}
+                                aria-label={`Notifications${unreadCount ? `, ${unreadCount} unread` : ''}`}
+                                aria-expanded={notifOpen}
+                                className={`relative p-2 rounded-full transition-colors ${notifOpen ? 'bg-blue-50 text-brand-blue' : 'text-gray-500 hover:text-gray-800 hover:bg-gray-100'}`}
+                            >
+                                <Icon name="bell" className="w-6 h-6" />
+                                {unreadCount > 0 && (
+                                    <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] px-1 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center border-2 border-white">
+                                        {unreadCount > 9 ? '9+' : unreadCount}
+                                    </span>
+                                )}
+                            </button>
+
+                            {notifOpen && (
+                                <div className="absolute right-0 top-full mt-3 w-[26rem] bg-white rounded-xl shadow-xl border border-gray-100 overflow-hidden z-30">
+                                    <div className="px-4 pt-4 pb-3 border-b">
+                                        <div className="flex items-center justify-between mb-3">
+                                            <h3 className="font-bold text-gray-900">Notifications</h3>
+                                            {unreadCount > 0 && (
+                                                <span className="text-xs font-semibold bg-red-50 text-red-600 px-2 py-0.5 rounded-full">{unreadCount} new</span>
+                                            )}
+                                        </div>
+                                        <div className="flex gap-2">
+                                            {['all', 'unread'].map(tab => (
+                                                <button
+                                                    key={tab}
+                                                    type="button"
+                                                    onClick={() => setNotifTab(tab)}
+                                                    className={`text-xs font-semibold px-3 py-1.5 rounded-full capitalize transition-colors ${notifTab === tab ? 'bg-brand-blue text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
+                                                >
+                                                    {tab}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                    <div className="max-h-96 overflow-y-auto chat-scroll">
+                                        {visibleNotifs.length === 0 ? (
+                                            <div className="p-8 text-center">
+                                                <Icon name="bell-off" className="w-10 h-10 text-gray-300 mx-auto mb-3" />
+                                                <p className="text-sm font-semibold text-gray-800">
+                                                    {notifTab === 'unread' ? "You're all caught up" : 'No notifications'}
+                                                </p>
+                                                <p className="text-xs text-gray-500 mt-1">
+                                                    {notifTab === 'unread' ? 'No unread notifications right now.' : 'Deadline reminders and application updates will show up here.'}
+                                                </p>
+                                            </div>
+                                        ) : (
+                                            visibleNotifs.map(n => {
+                                                const style = NOTIF_STYLES[n.type] || NOTIF_STYLES.info;
+                                                return (
+                                                    <div
+                                                        key={n.id}
+                                                        className={`group relative flex items-start gap-3 px-4 py-3 border-b border-gray-50 cursor-pointer transition-colors ${n.read ? 'hover:bg-gray-50' : 'bg-blue-50/60 hover:bg-blue-50'}`}
+                                                        onClick={() => { setNotifOpen(false); onNotifClick(n); }}
+                                                    >
+                                                        <div className={`w-9 h-9 rounded-full flex items-center justify-center shrink-0 ${style.bg} ${style.text}`}>
+                                                            <Icon name={style.icon} className="w-4 h-4" />
+                                                        </div>
+                                                        <div className="min-w-0 flex-1 pr-5">
+                                                            <p className={`text-sm text-gray-900 ${n.read ? 'font-medium' : 'font-bold'}`}>{n.title}</p>
+                                                            <p className="text-xs text-gray-600 mt-0.5 line-clamp-2">{n.body}</p>
+                                                            <p className="text-[11px] text-gray-400 mt-1">{n.meta}</p>
+                                                        </div>
+                                                        {!n.read && <span className="w-2 h-2 bg-brand-blue rounded-full mt-2 shrink-0"></span>}
+                                                        <button
+                                                            type="button"
+                                                            onClick={(e) => { e.stopPropagation(); onDismissNotif(n.id); }}
+                                                            aria-label="Dismiss notification"
+                                                            className="absolute top-2 right-2 p-1 rounded-full text-gray-300 hover:text-gray-600 hover:bg-gray-100 opacity-0 group-hover:opacity-100 transition-opacity"
+                                                        >
+                                                            <Icon name="x" className="w-3.5 h-3.5" />
+                                                        </button>
+                                                    </div>
+                                                );
+                                            })
+                                        )}
+                                    </div>
+
+                                    {notifications.length > 0 && (
+                                        <div className="flex items-center justify-between px-4 py-3 bg-gray-50 border-t">
+                                            <button
+                                                type="button"
+                                                onClick={onMarkAllRead}
+                                                disabled={unreadCount === 0}
+                                                className="text-xs font-semibold text-brand-blue hover:underline disabled:text-gray-400 disabled:no-underline disabled:cursor-default flex items-center gap-1"
+                                            >
+                                                <Icon name="check-check" className="w-4 h-4" /> Mark all as read
+                                            </button>
+                                            <button
+                                                type="button"
+                                                onClick={onClearAll}
+                                                className="text-xs font-semibold text-gray-500 hover:text-red-600 flex items-center gap-1"
+                                            >
+                                                <Icon name="trash-2" className="w-4 h-4" /> Clear all
+                                            </button>
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+                        </div>
+
                         <div className="flex items-center gap-3">
                             <div className="w-10 h-10 bg-brand-blue text-white rounded-full flex items-center justify-center font-bold uppercase">
                                 {user.name.charAt(0)}
@@ -451,56 +1087,117 @@
         };
 
         // --- UPLOAD REQUIREMENT MODAL ---
+        const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+        const DEFAULT_FILE_TYPES = ['pdf', 'doc', 'docx', 'jpg', 'jpeg', 'png'];
+
+        const formatFileSize = (bytes) => {
+            if (bytes < 1024) return `${bytes} B`;
+            if (bytes < 1024 * 1024) return `${Math.round(bytes / 1024)} KB`;
+            return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+        };
+
+        // One upload slot per required document. Falls back to a single slot built from `requirement`.
+        const getDocuments = (opp) => Array.isArray(opp.documents)
+            ? opp.documents
+            : [{ id: 'document', label: 'Required document', hint: opp.requirement, required: true }];
+
         const OpportunityDetailModal = ({ opportunity, onClose, onSubmit }) => {
             const [step, setStep] = useState(1);
-            const [fileName, setFileName] = useState('');
+            const [files, setFiles] = useState({});        // { [docId]: { name, size } }
+            const [errors, setErrors] = useState({});      // { [docId]: 'message' }
+            const [dragOver, setDragOver] = useState(null);
+            const [agreed, setAgreed] = useState(false);
             const [isSubmitting, setIsSubmitting] = useState(false);
+            const scrollRef = useRef(null);
 
-            const handleFileChange = (e) => {
-                if(e.target.files.length > 0) setFileName(e.target.files[0].name);
+            const documents = getDocuments(opportunity);
+            const requiredDocs = documents.filter(d => d.required);
+            const uploadedRequired = requiredDocs.filter(d => files[d.id]).length;
+            const noDocsNeeded = documents.length === 0;
+            const canSubmit = uploadedRequired === requiredDocs.length && agreed && !isSubmitting;
+
+            // The modal re-renders on its own (steps, uploads), so refresh the lucide icons here.
+            useEffect(() => { lucide.createIcons(); });
+            useEffect(() => { if (scrollRef.current) scrollRef.current.scrollTop = 0; }, [step]);
+
+            const handleFile = (doc, file) => {
+                if (!file) return;
+                const allowed = doc.accept || DEFAULT_FILE_TYPES;
+                const ext = file.name.includes('.') ? file.name.split('.').pop().toLowerCase() : '';
+                let message = '';
+                if (!allowed.includes(ext)) {
+                    message = `That file type isn't accepted. Please upload a ${allowed.map(a => a.toUpperCase()).join(', ')} file.`;
+                } else if (file.size > MAX_FILE_SIZE) {
+                    message = `That file is ${formatFileSize(file.size)}. The maximum size is 5MB.`;
+                }
+                if (message) {
+                    setErrors(prev => ({ ...prev, [doc.id]: message }));
+                    return;
+                }
+                setErrors(prev => { const next = { ...prev }; delete next[doc.id]; return next; });
+                setFiles(prev => ({ ...prev, [doc.id]: { name: file.name, size: file.size } }));
+            };
+
+            const onPick = (doc, e) => {
+                handleFile(doc, e.target.files && e.target.files[0]);
+                e.target.value = ''; // lets the same file be picked again after removing it
+            };
+
+            const removeFile = (docId) => {
+                setFiles(prev => { const next = { ...prev }; delete next[docId]; return next; });
             };
 
             const handleSubmit = (e) => {
                 e.preventDefault();
-                if(!fileName) return alert("Please attach the required document.");
+                if (!canSubmit) return;
                 setIsSubmitting(true);
+                const submitted = documents.filter(d => files[d.id]).map(d => ({ label: d.label, name: files[d.id].name }));
                 setTimeout(() => {
-                    onSubmit(opportunity);
+                    onSubmit(opportunity, submitted);
                     setIsSubmitting(false);
                 }, 1000);
             };
 
+            const stepPill = (n, label) => (
+                <span className={`px-2.5 py-1 rounded-full ${step === n ? 'bg-white text-brand-blue' : 'bg-white/20 text-white'}`}>{n}. {label}</span>
+            );
+
             return (
                 <div className="fixed inset-0 z-50 flex items-center justify-center modal-backdrop p-4">
                     <div className="bg-white rounded-2xl w-full max-w-2xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
-                        
+
                         {/* Header */}
                         <div className="bg-brand-blue p-6 text-white relative shrink-0">
-                            <button onClick={onClose} className="absolute top-4 right-4 text-white/80 hover:text-white"><i data-lucide="x" className="w-6 h-6"></i></button>
+                            <button onClick={onClose} aria-label="Close" className="absolute top-4 right-4 text-white/80 hover:text-white"><Icon name="x" className="w-6 h-6" /></button>
                             <span className="text-xs font-bold uppercase tracking-wider bg-blue-700/50 px-2 py-1 rounded-md mb-2 inline-block">
                                 {opportunity.type}
                             </span>
-                            <h3 className="text-2xl font-bold mb-1 leading-tight">{opportunity.title}</h3>
-                            <p className="text-blue-100 flex items-center gap-2"><i data-lucide="building" className="w-4 h-4"></i> {opportunity.provider}</p>
+                            <h3 className="text-2xl font-bold mb-1 leading-tight pr-8">{opportunity.title}</h3>
+                            <p className="text-blue-100 flex items-center gap-2"><Icon name="building" className="w-4 h-4" /> {opportunity.provider}</p>
+                            <div className="flex items-center gap-2 mt-4 text-xs font-semibold">
+                                {stepPill(1, 'Overview')}
+                                <Icon name="chevron-right" className="w-3 h-3 text-white/60" />
+                                {stepPill(2, 'Apply')}
+                            </div>
                         </div>
 
                         {/* Scrollable Content Area */}
-                        <div className="p-6 overflow-y-auto flex-1 chat-scroll">
-                            
+                        <div ref={scrollRef} className="p-6 overflow-y-auto flex-1 chat-scroll">
+
                             {step === 1 && (
                                 <div className="space-y-6">
                                     <img src={opportunity.image} alt={opportunity.title} className="w-full h-48 object-cover rounded-xl" />
-                                    
+
                                     <div className="grid grid-cols-2 gap-4 bg-gray-50 p-4 rounded-xl border border-gray-100">
                                         <div className="flex items-center gap-3">
-                                            <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center shrink-0"><i data-lucide="map-pin" className="w-4 h-4"></i></div>
+                                            <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center shrink-0"><Icon name="map-pin" className="w-4 h-4" /></div>
                                             <div>
                                                 <p className="text-xs text-gray-500">Location</p>
                                                 <p className="text-sm font-semibold text-gray-900">{opportunity.location}</p>
                                             </div>
                                         </div>
                                         <div className="flex items-center gap-3">
-                                            <div className="w-8 h-8 rounded-full bg-red-100 text-red-600 flex items-center justify-center shrink-0"><i data-lucide="calendar" className="w-4 h-4"></i></div>
+                                            <div className="w-8 h-8 rounded-full bg-red-100 text-red-600 flex items-center justify-center shrink-0"><Icon name="calendar" className="w-4 h-4" /></div>
                                             <div>
                                                 <p className="text-xs text-gray-500">Deadline</p>
                                                 <p className="text-sm font-semibold text-gray-900">{opportunity.deadline}</p>
@@ -515,12 +1212,12 @@
 
                                     <div className="bg-yellow-50 border border-yellow-200 p-5 rounded-xl">
                                         <h4 className="text-md font-bold text-yellow-800 mb-3 flex items-center gap-2">
-                                            <i data-lucide="clipboard-list" className="w-5 h-5"></i> Requirements
+                                            <Icon name="clipboard-list" className="w-5 h-5" /> Requirements
                                         </h4>
                                         <ul className="space-y-2">
                                             {opportunity.requirementDetails.map((req, index) => (
                                                 <li key={index} className="text-sm text-yellow-800 flex items-start gap-2">
-                                                    <i data-lucide="check-circle" className="w-4 h-4 mt-0.5 shrink-0"></i>
+                                                    <Icon name="check" className="w-4 h-4 mt-0.5" />
                                                     <span>{req}</span>
                                                 </li>
                                             ))}
@@ -530,49 +1227,185 @@
                             )}
 
                             {step === 2 && (
-                                <div>
-                                    <div className="bg-blue-50 border border-blue-100 p-4 rounded-lg mb-6">
+                                <div className="space-y-8">
+                                    <div className="bg-blue-50 border border-blue-100 p-4 rounded-lg">
                                         <p className="text-sm text-blue-800 font-medium">
-                                            You are applying for: <br/> <span className="font-bold">{opportunity.title}</span>
+                                            You are applying for: <br /> <span className="font-bold">{opportunity.title}</span>
                                         </p>
                                     </div>
 
-                                    <div className="mb-6">
-                                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                                            Upload Document <span className="text-red-500">*</span>
-                                        </label>
-                                        <p className="text-xs text-gray-500 mb-3">Specifically required: {opportunity.requirement}</p>
-                                        
-                                        <div className={`border-2 border-dashed rounded-xl p-8 text-center transition-colors relative cursor-pointer ${fileName ? 'border-green-400 bg-green-50' : 'border-gray-300 hover:bg-gray-50'}`}>
-                                            <input type="file" onChange={handleFileChange} className="absolute inset-0 w-full h-full opacity-0 cursor-pointer" accept=".pdf,.doc,.docx,.jpg,.png" />
-                                            <i data-lucide={fileName ? "file-check" : "upload-cloud"} className={`w-10 h-10 mx-auto mb-3 ${fileName ? 'text-green-500' : 'text-gray-400'}`}></i>
-                                            <p className={`text-sm font-medium ${fileName ? 'text-green-700' : 'text-gray-600'}`}>
-                                                {fileName ? fileName : "Click to browse or drag and drop your file"}
-                                            </p>
-                                            <p className="text-xs text-gray-400 mt-1">PDF, Word, or Image (Max 5MB)</p>
+                                    {/* ---- More details ---- */}
+                                    <section>
+                                        <h4 className="text-lg font-bold text-gray-900 mb-3 flex items-center gap-2">
+                                            <Icon name="info" className="w-5 h-5 text-brand-blue" /> More Details
+                                        </h4>
+
+                                        {opportunity.details && opportunity.details.length > 0 && (
+                                            <div className="grid grid-cols-2 gap-3">
+                                                {opportunity.details.map((d, i) => (
+                                                    <div key={i} className="flex items-start gap-3 bg-gray-50 border border-gray-100 rounded-xl p-3">
+                                                        <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center shrink-0">
+                                                            <Icon name={d.icon} className="w-4 h-4" />
+                                                        </div>
+                                                        <div className="min-w-0">
+                                                            <p className="text-xs text-gray-500">{d.label}</p>
+                                                            <p className="text-sm font-semibold text-gray-900">{d.value}</p>
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        )}
+
+                                        {opportunity.highlights && opportunity.highlights.length > 0 && (
+                                            <div className="mt-4 bg-green-50 border border-green-100 rounded-xl p-5">
+                                                <h5 className="text-sm font-bold text-green-800 mb-3">{opportunity.highlightsTitle || 'Highlights'}</h5>
+                                                <ul className="space-y-2">
+                                                    {opportunity.highlights.map((h, i) => (
+                                                        <li key={i} className="text-sm text-green-900 flex items-start gap-2">
+                                                            <Icon name="check" className="w-4 h-4 mt-0.5 text-green-600" />
+                                                            <span>{h}</span>
+                                                        </li>
+                                                    ))}
+                                                </ul>
+                                            </div>
+                                        )}
+
+                                        {opportunity.process && opportunity.process.length > 0 && (
+                                            <div className="mt-4">
+                                                <h5 className="text-sm font-bold text-gray-900 mb-3">How the application works</h5>
+                                                <ol className="space-y-3">
+                                                    {opportunity.process.map((p, i) => (
+                                                        <li key={i} className="flex items-start gap-3">
+                                                            <span className="w-6 h-6 rounded-full bg-brand-blue text-white text-xs font-bold flex items-center justify-center shrink-0">{i + 1}</span>
+                                                            <span className="text-sm text-gray-700 pt-0.5">{p}</span>
+                                                        </li>
+                                                    ))}
+                                                </ol>
+                                            </div>
+                                        )}
+                                    </section>
+
+                                    {/* ---- Upload requirements ---- */}
+                                    <section>
+                                        <div className="flex items-center justify-between mb-2">
+                                            <h4 className="text-lg font-bold text-gray-900 flex items-center gap-2">
+                                                <Icon name="upload" className="w-5 h-5 text-brand-blue" /> {noDocsNeeded ? 'Confirm Attendance' : 'Upload Your Requirements'}
+                                            </h4>
+                                            {requiredDocs.length > 0 && (
+                                                <span className="text-xs font-semibold text-gray-500">{uploadedRequired} of {requiredDocs.length} required</span>
+                                            )}
                                         </div>
-                                    </div>
+
+                                        {requiredDocs.length > 0 && (
+                                            <div className="h-1.5 bg-gray-100 rounded-full mb-4 overflow-hidden">
+                                                <div className="h-full bg-brand-blue transition-all" style={{ width: `${(uploadedRequired / requiredDocs.length) * 100}%` }}></div>
+                                            </div>
+                                        )}
+
+                                        {noDocsNeeded && (
+                                            <div className="bg-green-50 border border-green-200 rounded-xl p-4 text-sm text-green-800">
+                                                {opportunity.requirement}
+                                            </div>
+                                        )}
+
+                                        <div className="space-y-4">
+                                            {documents.map(doc => {
+                                                const file = files[doc.id];
+                                                const err = errors[doc.id];
+                                                const types = doc.accept || DEFAULT_FILE_TYPES;
+                                                const acceptAttr = types.map(t => '.' + t).join(',');
+                                                return (
+                                                    <div key={doc.id} className={`rounded-xl border p-4 transition-colors ${file ? 'border-green-300 bg-green-50/50' : err ? 'border-red-300 bg-red-50/40' : 'border-gray-200 bg-white'}`}>
+                                                        <div className="flex items-start justify-between gap-3 mb-3">
+                                                            <div>
+                                                                <p className="text-sm font-semibold text-gray-900">
+                                                                    {doc.label} {doc.required
+                                                                        ? <span className="text-red-500">*</span>
+                                                                        : <span className="text-xs font-normal text-gray-400">(optional)</span>}
+                                                                </p>
+                                                                {doc.hint && <p className="text-xs text-gray-500 mt-0.5">{doc.hint}</p>}
+                                                            </div>
+                                                            {file && <span className="text-[10px] font-bold uppercase bg-green-100 text-green-700 px-2 py-1 rounded-full shrink-0">Uploaded</span>}
+                                                        </div>
+
+                                                        {file ? (
+                                                            <div className="flex items-center gap-3 bg-white border border-green-200 rounded-lg px-3 py-2.5">
+                                                                <Icon name="file-check" className="w-5 h-5 text-green-600" />
+                                                                <div className="min-w-0 flex-1">
+                                                                    <p className="text-sm font-medium text-gray-800 truncate">{file.name}</p>
+                                                                    <p className="text-xs text-gray-400">{formatFileSize(file.size)}</p>
+                                                                </div>
+                                                                <label className="text-xs font-semibold text-brand-blue hover:underline cursor-pointer">
+                                                                    Replace
+                                                                    <input type="file" className="hidden" accept={acceptAttr} onChange={(e) => onPick(doc, e)} />
+                                                                </label>
+                                                                <button type="button" onClick={() => removeFile(doc.id)} aria-label={`Remove ${doc.label}`} className="text-gray-400 hover:text-red-500">
+                                                                    <Icon name="trash-2" className="w-4 h-4" />
+                                                                </button>
+                                                            </div>
+                                                        ) : (
+                                                            <label
+                                                                onDragOver={(e) => { e.preventDefault(); setDragOver(doc.id); }}
+                                                                onDragLeave={() => setDragOver(null)}
+                                                                onDrop={(e) => { e.preventDefault(); setDragOver(null); handleFile(doc, e.dataTransfer.files && e.dataTransfer.files[0]); }}
+                                                                className={`block border-2 border-dashed rounded-lg p-5 text-center cursor-pointer transition-colors ${dragOver === doc.id ? 'border-brand-blue bg-blue-50' : 'border-gray-300 hover:bg-gray-50'}`}
+                                                            >
+                                                                <input type="file" className="hidden" accept={acceptAttr} onChange={(e) => onPick(doc, e)} />
+                                                                <Icon name="upload" className="w-7 h-7 mx-auto mb-2 text-gray-400" />
+                                                                <p className="text-sm font-medium text-gray-600">Click to browse or drag and drop</p>
+                                                                <p className="text-xs text-gray-400 mt-1">{types.map(t => t.toUpperCase()).join(', ')} · Max 5MB</p>
+                                                            </label>
+                                                        )}
+
+                                                        {err && (
+                                                            <p className="text-xs text-red-600 mt-2 flex items-start gap-1.5">
+                                                                <Icon name="info" className="w-3.5 h-3.5 mt-0.5" /> <span>{err}</span>
+                                                            </p>
+                                                        )}
+                                                    </div>
+                                                );
+                                            })}
+                                        </div>
+
+                                        <label className="flex items-start gap-3 bg-gray-50 border border-gray-200 rounded-xl p-4 cursor-pointer mt-5">
+                                            <input type="checkbox" checked={agreed} onChange={(e) => setAgreed(e.target.checked)} className="mt-0.5 w-4 h-4 accent-brand-blue" />
+                                            <span className="text-sm text-gray-700">
+                                                {noDocsNeeded
+                                                    ? 'I confirm that I will attend and bring a valid ID on the day of the event.'
+                                                    : 'I confirm that the documents I am submitting are true and correct.'}
+                                            </span>
+                                        </label>
+                                    </section>
                                 </div>
                             )}
                         </div>
 
                         {/* Footer Actions */}
-                        <div className="p-6 border-t bg-gray-50 flex gap-3 justify-between shrink-0">
+                        <div className="p-6 border-t bg-gray-50 flex gap-3 items-center justify-between shrink-0">
                             {step === 1 ? (
                                 <>
                                     <button type="button" onClick={onClose} className="px-5 py-2.5 rounded-lg font-medium text-gray-600 hover:bg-gray-200 transition-colors">Close</button>
                                     <button type="button" onClick={() => setStep(2)} className="px-6 py-2.5 rounded-lg font-bold text-white bg-brand-blue hover:bg-blue-700 transition-colors flex items-center gap-2">
-                                        Proceed to Apply <i data-lucide="arrow-right" className="w-4 h-4"></i>
+                                        Proceed to Apply <Icon name="arrow-right" className="w-4 h-4" />
                                     </button>
                                 </>
                             ) : (
                                 <>
                                     <button type="button" onClick={() => setStep(1)} className="px-5 py-2.5 rounded-lg font-medium text-gray-600 hover:bg-gray-200 transition-colors flex items-center gap-2">
-                                        <i data-lucide="arrow-left" className="w-4 h-4"></i> Back
+                                        <Icon name="arrow-left" className="w-4 h-4" /> Back
                                     </button>
-                                    <button onClick={handleSubmit} disabled={isSubmitting || !fileName} className="px-6 py-2.5 rounded-lg font-bold text-white bg-brand-blue hover:bg-blue-700 transition-colors flex items-center gap-2 disabled:opacity-50">
-                                        {isSubmitting ? 'Submitting...' : 'Submit Application'}
-                                    </button>
+                                    <div className="flex items-center gap-4">
+                                        {!canSubmit && !isSubmitting && (
+                                            <p className="text-xs text-gray-500 text-right">
+                                                {uploadedRequired < requiredDocs.length
+                                                    ? `Upload all required documents (${uploadedRequired}/${requiredDocs.length})`
+                                                    : 'Tick the confirmation box to continue'}
+                                            </p>
+                                        )}
+                                        <button onClick={handleSubmit} disabled={!canSubmit} className="px-6 py-2.5 rounded-lg font-bold text-white bg-brand-blue hover:bg-blue-700 transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap">
+                                            {isSubmitting ? 'Submitting...' : 'Submit Application'}
+                                        </button>
+                                    </div>
                                 </>
                             )}
                         </div>
@@ -662,6 +1495,59 @@
                     ) : (
                         <div className="grid grid-cols-3 gap-6">
                             {filtered.map(opp => <OpportunityCard key={opp.id} opp={opp} onApply={onApply} />)}
+                        </div>
+                    )}
+                </div>
+            );
+        };
+
+        const SearchResultsView = ({ query, onApply }) => {
+            const [typeFilter, setTypeFilter] = useState('All');
+            useEffect(() => { lucide.createIcons(); });
+
+            const trimmed = query.trim();
+            const matches = trimmed ? searchOpportunities(query) : mockOpportunities;
+            const types = ['All', ...Array.from(new Set(matches.map(o => o.type)))];
+            const activeFilter = types.includes(typeFilter) ? typeFilter : 'All';
+            const shown = activeFilter === 'All' ? matches : matches.filter(o => o.type === activeFilter);
+
+            return (
+                <div className="p-8 max-w-7xl mx-auto pt-28">
+                    <div className="mb-6">
+                        <h2 className="text-2xl font-bold text-gray-900">
+                            {trimmed ? <>Search results for "{trimmed}"</> : 'All Opportunities'}
+                        </h2>
+                        <p className="text-gray-500">
+                            {trimmed
+                                ? `${matches.length} result${matches.length === 1 ? '' : 's'} found`
+                                : 'Type in the search bar to narrow things down.'}
+                        </p>
+                    </div>
+
+                    {matches.length > 0 && (
+                        <div className="flex flex-wrap gap-2 mb-6">
+                            {types.map(t => (
+                                <button
+                                    key={t}
+                                    type="button"
+                                    onClick={() => setTypeFilter(t)}
+                                    className={`text-sm font-medium px-4 py-1.5 rounded-full border transition-colors ${activeFilter === t ? 'bg-brand-blue text-white border-brand-blue' : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'}`}
+                                >
+                                    {t}
+                                </button>
+                            ))}
+                        </div>
+                    )}
+
+                    {shown.length === 0 ? (
+                        <div className="bg-white p-12 rounded-xl text-center border border-gray-100">
+                            <Icon name="search-x" className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+                            <h3 className="text-lg font-bold text-gray-800">No opportunities found</h3>
+                            <p className="text-gray-500">Try a different keyword, like a job title, provider (TESDA, DTI) or location.</p>
+                        </div>
+                    ) : (
+                        <div className="grid grid-cols-3 gap-6">
+                            {shown.map(opp => <OpportunityCard key={opp.id} opp={opp} onApply={onApply} />)}
                         </div>
                     )}
                 </div>
@@ -798,6 +1684,11 @@
                                                     <div>
                                                         <p className="text-sm font-medium text-gray-900 line-clamp-1">{app.title}</p>
                                                         <p className="text-xs text-gray-500">Applied on {app.date}</p>
+                                                        {app.documents && app.documents.length > 0 && (
+                                                            <p className="text-xs text-gray-400" title={app.documents.map(d => `${d.label}: ${d.name}`).join('\n')}>
+                                                                {app.documents.length} document{app.documents.length > 1 ? 's' : ''} submitted
+                                                            </p>
+                                                        )}
                                                     </div>
                                                 </div>
                                                 <span className={`text-[10px] font-bold px-2 py-1 rounded-full whitespace-nowrap bg-yellow-100 text-yellow-700`}>
@@ -821,6 +1712,8 @@
             const [currentView, setCurrentView] = useState('dashboard');
             const [applications, setApplications] = useState([]);
             const [selectedOpp, setSelectedOpp] = useState(null);
+            const [searchQuery, setSearchQuery] = useState('');
+            const [notifState, setNotifState] = useState({ custom: [], read: [], dismissed: [] });
 
             useEffect(() => {
                 const savedUser = localStorage.getItem('kc_session');
@@ -831,25 +1724,81 @@
                 lucide.createIcons();
             });
 
+            // Load this user's saved notification state (read / dismissed / events).
+            useEffect(() => {
+                if (!user) return;
+                let saved = null;
+                try { saved = JSON.parse(localStorage.getItem(`kc_notifs_${user.id}`) || 'null'); } catch (e) {}
+                setNotifState({
+                    custom: (saved && saved.custom) || [],
+                    read: (saved && saved.read) || [],
+                    dismissed: (saved && saved.dismissed) || []
+                });
+            }, [user && user.id]);
+
+            const updateNotifs = (fn) => {
+                setNotifState(prev => {
+                    const next = fn(prev);
+                    if (user) {
+                        try { localStorage.setItem(`kc_notifs_${user.id}`, JSON.stringify(next)); } catch (e) {}
+                    }
+                    return next;
+                });
+            };
+
+            // Switching sections clears the search box; the search results page keeps it.
+            const navigate = (view) => {
+                setCurrentView(view);
+                if (view !== 'search') setSearchQuery('');
+            };
+
             const handleLogin = (userData) => {
                 setUser(userData);
                 localStorage.setItem('kc_session', JSON.stringify(userData));
             };
 
-            const handleApplySubmit = (opportunity) => {
+            const handleApplySubmit = (opportunity, documents = []) => {
                 const newApp = {
                     id: Date.now(),
                     title: opportunity.title,
                     status: 'Under Review',
+                    documents,
                     date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
                 };
                 setApplications([newApp, ...applications]);
+                updateNotifs(p => ({
+                    ...p,
+                    custom: [{
+                        id: `app-${newApp.id}`,
+                        type: 'application',
+                        title: 'Application submitted',
+                        body: `${opportunity.title} is now Under Review.` + (documents.length ? ` ${documents.length} document${documents.length > 1 ? 's' : ''} submitted.` : ''),
+                        ts: Date.now(),
+                        view: 'profile'
+                    }, ...p.custom]
+                }));
                 setSelectedOpp(null);
                 alert(`Successfully applied for: ${opportunity.title}`);
-                setCurrentView('profile'); 
+                navigate('profile'); 
             };
 
             if (!user) return <AuthScreen onLogin={handleLogin} />;
+
+            const notifications = buildNotifications(notifState, applications.map(a => a.title));
+            const unreadCount = notifications.filter(n => !n.read).length;
+
+            const handleNotifClick = (n) => {
+                updateNotifs(p => p.read.includes(n.id) ? p : { ...p, read: [...p.read, n.id] });
+                if (n.oppId) {
+                    const opp = mockOpportunities.find(o => o.id === n.oppId);
+                    if (opp) setSelectedOpp(opp);
+                } else if (n.view) {
+                    navigate(n.view);
+                }
+            };
+            const markAllRead = () => updateNotifs(p => ({ ...p, read: Array.from(new Set([...p.read, ...notifications.map(n => n.id)])) }));
+            const dismissNotif = (id) => updateNotifs(p => ({ ...p, dismissed: Array.from(new Set([...p.dismissed, id])) }));
+            const clearAllNotifs = () => updateNotifs(p => ({ ...p, dismissed: Array.from(new Set([...p.dismissed, ...notifications.map(n => n.id)])) }));
 
             const renderView = () => {
                 switch(currentView) {
@@ -858,6 +1807,7 @@
                     case 'training': return <FilteredOpportunitiesView filterType="Training" title="Training & Seminars" subtitle="Upgrade your skills with these free programs." onApply={setSelectedOpp} />;
                     case 'business': return <FilteredOpportunitiesView filterType="Livelihood" title="Small Business Resources" subtitle="Grants and loans to start or grow your negosyo." onApply={setSelectedOpp} />;
                     case 'financial': return <FilteredOpportunitiesView filterType="Financial Literacy" title="Financial Literacy" subtitle="Learn how to manage your money better." onApply={setSelectedOpp} />;
+                    case 'search': return <SearchResultsView query={searchQuery} onApply={setSelectedOpp} />;
                     case 'messages': return <MessagesView />;
                     case 'profile': return <ProfileView user={user} applications={applications} />;
                     default: return <DashboardView onApply={setSelectedOpp} user={user} />;
@@ -866,9 +1816,22 @@
 
             return (
                 <div className="min-h-screen bg-brand-light">
-                    <Sidebar currentView={currentView} setView={setCurrentView} />
+                    <Sidebar currentView={currentView} setView={navigate} />
                     <div className="ml-64">
-                        <Topbar user={user} />
+                        <Topbar
+                            user={user}
+                            query={searchQuery}
+                            onQueryChange={setSearchQuery}
+                            onSearchSubmit={() => setCurrentView('search')}
+                            onSelectOpp={setSelectedOpp}
+                            hideSuggestions={currentView === 'search'}
+                            notifications={notifications}
+                            unreadCount={unreadCount}
+                            onNotifClick={handleNotifClick}
+                            onMarkAllRead={markAllRead}
+                            onClearAll={clearAllNotifs}
+                            onDismissNotif={dismissNotif}
+                        />
                         {renderView()}
                     </div>
 
@@ -888,3 +1851,4 @@
     </script>
 </body>
 </html>
+
