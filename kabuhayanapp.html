@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -771,6 +770,7 @@
                 { id: 'dashboard', name: 'Dashboard', icon: 'layout-dashboard' },
                 { id: 'opportunities', name: 'Opportunities', icon: 'briefcase' },
                 { id: 'training', name: 'Training & Seminars', icon: 'book-open' },
+                { id: 'courses', name: 'My Courses', icon: 'graduation-cap' },
                 { id: 'business', name: 'Small Business Resources', icon: 'store' },
                 { id: 'financial', name: 'Financial Literacy', icon: 'wallet' },
                 { id: 'messages', name: 'Messages', icon: 'message-square' },
@@ -1706,6 +1706,161 @@
         };
 
 
+
+        // --- COURSE MODULES (unlocked after a training application is submitted) ---
+        const L = (t, d, x) => ({ title: t, mins: d, text: x });
+        const COURSES = {
+            1: { modules: [
+                { title: "Computer Basics", lessons: [
+                    L("Parts of a Computer", 8, "A computer has input devices (keyboard, mouse), a processor that does the work, memory and storage that hold data, and output devices (monitor, printer). Knowing each part helps you troubleshoot and ask for the right help."),
+                    L("Files and Folders", 10, "Files hold your work; folders keep them organized. Give files clear names such as 'Resume_JuanDelaCruz.docx', and save to a folder you can find again. Always back up important files on a USB drive or cloud storage.")],
+                  quiz: { q: "Which device is an INPUT device?", o: ["Monitor", "Keyboard", "Printer"], a: 1 } },
+                { title: "MS Office Essentials", lessons: [
+                    L("Word: Writing a Document", 12, "Use Word to write letters and resumes. Learn to type, change font and size, align text, and use bullet points. Save often with Ctrl+S and export to PDF before sending."),
+                    L("Excel: Simple Tables and Formulas", 12, "Excel stores data in rows and columns. Start a formula with '=' such as =SUM(B2:B6) to add numbers. Useful for budgets, sales lists, and attendance records.")],
+                  quiz: { q: "Which formula adds the cells B2 to B6?", o: ["=ADD(B2-B6)", "=SUM(B2:B6)", "SUM B2:B6"], a: 1 } },
+                { title: "Internet and Digital Tools", lessons: [
+                    L("Safe Browsing and Email", 10, "Use strong passwords, never share OTPs, and check that links are real before clicking. For email, write a clear subject line, a polite greeting, and attach files before sending."),
+                    L("Searching for Jobs Online", 10, "Use job sites and the PESO/PhilJobNet portal to look for openings. Keep your resume updated, and never pay a fee just to be 'hired'. That is a common scam.")],
+                  quiz: { q: "A message asks for your OTP to 'claim a prize'. What should you do?", o: ["Send it quickly", "Ignore it and never share OTPs", "Reply with your ID"], a: 1 } }
+            ]},
+            6: { modules: [
+                { title: "Coffee Basics", lessons: [
+                    L("Beans and Roasts", 8, "Arabica is smooth and slightly sweet; Robusta is stronger and more bitter. Light roasts taste fruity, dark roasts taste bold and smoky. Barako from Batangas is a proud local Liberica variety."),
+                    L("Brewing Methods", 10, "Common methods include drip, French press, pour-over, and espresso. Each needs a different grind size and brew time. Coarse grind for French press, fine grind for espresso.")],
+                  quiz: { q: "Which grind size suits a French press?", o: ["Coarse", "Extra fine", "Powder"], a: 0 } },
+                { title: "Espresso and Milk Drinks", lessons: [
+                    L("Pulling an Espresso Shot", 12, "A standard shot uses about 18g of ground coffee and takes 25 to 30 seconds. Tamp evenly, lock in the portafilter, and watch the golden crema. A shot that runs too fast tastes sour; too slow tastes bitter."),
+                    L("Steaming Milk", 12, "Keep the steam wand tip just under the milk surface to add air, then lower it to swirl. Stop at about 60 to 65 degrees Celsius. Latte has little foam; cappuccino has more.")],
+                  quiz: { q: "An espresso shot that runs too fast usually tastes:", o: ["Sour", "Bitter", "Sweet"], a: 0 } },
+                { title: "Service and Hygiene", lessons: [
+                    L("Taking Orders and Handling Customers", 8, "Greet with a smile, repeat the order back, and suggest add-ons politely. If a drink is wrong, apologize and remake it quickly. Calm, friendly service brings customers back."),
+                    L("Food Safety and Cleanliness", 8, "Wash your hands often, wear a hair net and apron, and sanitize the bar and tools between orders. Wipe the steam wand after every use and keep milk refrigerated.")],
+                  quiz: { q: "When should you wipe the steam wand?", o: ["End of week", "After every use", "Only when dirty"], a: 1 } }
+            ]},
+            8: { modules: [
+                { title: "Marketing Foundations", lessons: [
+                    L("What Is Digital Marketing?", 8, "Digital marketing means promoting your product online through social media, messaging apps, search, and email. It is low-cost and lets even a small sari-sari store reach nearby customers."),
+                    L("Know Your Customer", 10, "Ask who buys from you, what they need, and where they spend time online. A clear target (for example, students within your barangay) makes every post and offer more effective.")],
+                  quiz: { q: "Why define a target customer first?", o: ["To post less", "To make posts and offers more effective", "To avoid social media"], a: 1 } },
+                { title: "Social Media for Business", lessons: [
+                    L("Setting Up a Facebook Page", 10, "Create a Page (not a personal profile) with your business name, logo, contact number, location, and store hours. Pin your best offer at the top."),
+                    L("Content That Sells", 10, "Mix product photos, customer testimonials, tips, and promos. Post consistently, use clear photos in good light, and always add how to order.")],
+                  quiz: { q: "What should every business post include?", o: ["How to order", "Long essays", "Nothing"], a: 0 } },
+                { title: "Selling and Measuring Online", lessons: [
+                    L("Messaging and Payments", 8, "Reply to messages quickly and politely. Accept GCash, Maya, or bank transfer, confirm payment before shipping, and keep proof of every transaction."),
+                    L("Tracking Your Results", 8, "Check which posts get the most reactions, messages, and sales. Do more of what works. Write down weekly sales so you know if your marketing is paying off.")],
+                  quiz: { q: "Why track your results?", o: ["To do more of what works", "To delete your Page", "It has no use"], a: 0 } }
+            ]}
+        };
+        const courseTotal = (c) => c.modules.reduce((n, m) => n + m.lessons.length + 1, 0);
+        const courseCount = (pr) => ((pr && pr.done) || []).length + Object.keys((pr && pr.quiz) || {}).length;
+
+        const CourseView = ({ opp, user, prog, update, onBack, welcome }) => {
+            const course = COURSES[opp.id];
+            const done = prog.done || [], quiz = prog.quiz || {};
+            const items = [];
+            course.modules.forEach((m, mi) => { m.lessons.forEach((_, li) => items.push({ m: mi, l: li })); items.push({ m: mi, quiz: true }); });
+            const isDone = (it) => it.quiz ? !!quiz[it.m] : done.includes(`${it.m}-${it.l}`);
+            const unlocked = (it) => !it.quiz || course.modules[it.m].lessons.every((_, li) => done.includes(`${it.m}-${li}`));
+            const [sel, setSel] = useState(() => items.find(i => !isDone(i)) || items[0]);
+            const [pick, setPick] = useState(null);
+            useEffect(() => { lucide.createIcons(); });
+            const pct = Math.round(courseCount(prog) / courseTotal(course) * 100);
+            const idx = items.findIndex(i => i.m === sel.m && i.l === sel.l && !!i.quiz === !!sel.quiz);
+            const goNext = () => { const n = items[idx + 1]; if (n) { setSel(n); setPick(null); } };
+            const open = (it) => { if (unlocked(it)) { setSel(it); setPick(null); } };
+            const mod = course.modules[sel.m];
+            const lesson = !sel.quiz && mod.lessons[sel.l];
+            const completeLesson = () => { update(p => ({ ...p, done: Array.from(new Set([...(p.done || []), `${sel.m}-${sel.l}`])) })); goNext(); };
+            const answer = (i) => { setPick(i); if (i === mod.quiz.a) update(p => ({ ...p, quiz: { ...(p.quiz || {}), [sel.m]: true } })); };
+            return (
+                <div className="p-8 max-w-6xl mx-auto pt-28">
+                    <button onClick={onBack} className="text-sm text-brand-blue font-semibold mb-4 flex items-center gap-1"><Icon name="arrow-left" className="w-4 h-4" /> All my courses</button>
+                    {welcome && <div className="bg-green-50 border border-green-200 text-green-800 rounded-xl p-4 mb-4 text-sm">Application submitted! You're enrolled. Start your first module below. Your progress is saved automatically.</div>}
+                    <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6 mb-6">
+                        <p className="text-xs font-bold uppercase text-brand-blue">{opp.provider} · Online Course</p>
+                        <h2 className="text-2xl font-bold text-gray-900 mb-3">{opp.title}</h2>
+                        <div className="h-2 bg-gray-100 rounded-full overflow-hidden"><div className="h-full bg-brand-blue transition-all" style={{ width: pct + '%' }}></div></div>
+                        <p className="text-xs text-gray-500 mt-2">{pct}% complete</p>
+                        {pct === 100 && <div className="mt-4 bg-yellow-50 border border-yellow-200 rounded-lg p-4 text-sm text-yellow-800 flex items-center gap-2"><Icon name="award" className="w-5 h-5" /> Congratulations, {user.name.split(' ')[0]}! You completed this course. Certificate of Completion, {opp.provider}.</div>}
+                    </div>
+                    <div className="grid grid-cols-12 gap-6">
+                        <div className="col-span-4 space-y-3">
+                            {course.modules.map((m, mi) => (
+                                <div key={mi} className="bg-white rounded-xl border border-gray-100 shadow-sm p-4">
+                                    <p className="text-xs font-bold text-gray-400 uppercase">Module {mi + 1}</p>
+                                    <p className="font-bold text-gray-900 mb-2">{m.title}</p>
+                                    {items.filter(i => i.m === mi).map((it, k) => {
+                                        const active = sel.m === it.m && sel.l === it.l && !!sel.quiz === !!it.quiz;
+                                        const ok = isDone(it), lock = !unlocked(it);
+                                        return (
+                                            <button key={k} onClick={() => open(it)} disabled={lock} className={`w-full text-left flex items-center gap-2 px-3 py-2 rounded-lg text-sm ${active ? 'bg-blue-50 text-brand-blue font-semibold' : 'text-gray-700 hover:bg-gray-50'} disabled:opacity-40`}>
+                                                <Icon name={ok ? 'check-circle' : lock ? 'lock' : it.quiz ? 'help-circle' : 'play-circle'} className={`w-4 h-4 ${ok ? 'text-green-600' : ''}`} />
+                                                <span className="truncate">{it.quiz ? 'Module Quiz' : m.lessons[it.l].title}</span>
+                                            </button>
+                                        );
+                                    })}
+                                </div>
+                            ))}
+                        </div>
+                        <div className="col-span-8 bg-white rounded-xl border border-gray-100 shadow-sm p-8">
+                            <p className="text-xs font-bold text-gray-400 uppercase mb-1">Module {sel.m + 1}: {mod.title}</p>
+                            {lesson ? (
+                                <>
+                                    <h3 className="text-xl font-bold text-gray-900 mb-1">{lesson.title}</h3>
+                                    <p className="text-xs text-gray-500 mb-4 flex items-center gap-1"><Icon name="clock" className="w-3 h-3" /> {lesson.mins} min read</p>
+                                    <p className="text-gray-700 leading-relaxed mb-6">{lesson.text}</p>
+                                    <button onClick={completeLesson} className="px-6 py-2.5 rounded-lg font-bold text-white bg-brand-blue hover:bg-blue-700">{done.includes(`${sel.m}-${sel.l}`) ? 'Continue' : 'Mark as Complete & Continue'}</button>
+                                </>
+                            ) : (
+                                <>
+                                    <h3 className="text-xl font-bold text-gray-900 mb-4">Module Quiz</h3>
+                                    <p className="font-medium text-gray-800 mb-4">{mod.quiz.q}</p>
+                                    <div className="space-y-2 mb-4">
+                                        {mod.quiz.o.map((o, i) => (
+                                            <button key={i} onClick={() => answer(i)} className={`w-full text-left px-4 py-3 rounded-lg border text-sm ${pick === i ? (i === mod.quiz.a ? 'border-green-400 bg-green-50' : 'border-red-300 bg-red-50') : 'border-gray-200 hover:bg-gray-50'}`}>{o}</button>
+                                        ))}
+                                    </div>
+                                    {pick !== null && pick !== mod.quiz.a && <p className="text-sm text-red-600 mb-3">Not quite. Try another answer.</p>}
+                                    {(quiz[sel.m] || pick === mod.quiz.a) && <div><p className="text-sm text-green-700 mb-3">Correct! Module complete.</p>{items[idx + 1] && <button onClick={goNext} className="px-6 py-2.5 rounded-lg font-bold text-white bg-brand-blue hover:bg-blue-700">Next Module</button>}</div>}
+                                </>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        const CoursesView = ({ progress, updateProgress, user, activeId, setActiveId, welcome, onBrowse }) => {
+            useEffect(() => { lucide.createIcons(); });
+            const enrolled = mockOpportunities.filter(o => progress[o.id] && COURSES[o.id]);
+            const active = enrolled.find(o => o.id === activeId);
+            if (active) return <CourseView key={active.id} opp={active} user={user} prog={progress[active.id]} update={(fn) => updateProgress(active.id, fn)} onBack={() => setActiveId(null)} welcome={welcome} />;
+            return (
+                <div className="p-8 max-w-7xl mx-auto pt-28">
+                    <h2 className="text-2xl font-bold text-gray-900 mb-1">My Courses</h2>
+                    <p className="text-sm text-gray-500 mb-6">Training programs you applied to unlock their course modules.</p>
+                    {enrolled.length === 0 ? (
+                        <div className="bg-white rounded-xl border border-gray-100 p-10 text-center">
+                            <p className="text-gray-500 mb-4">No courses yet. Apply to a training to get started.</p>
+                            <button onClick={onBrowse} className="px-5 py-2.5 rounded-lg font-bold text-white bg-brand-blue">Browse Trainings</button>
+                        </div>
+                    ) : (
+                        <div className="grid grid-cols-3 gap-6">
+                            {enrolled.map(o => { const pct = Math.round(courseCount(progress[o.id]) / courseTotal(COURSES[o.id]) * 100); return (
+                                <button key={o.id} onClick={() => setActiveId(o.id)} className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden text-left hover:shadow-md transition">
+                                    <img src={o.image} alt="" className="h-32 w-full object-cover" />
+                                    <div className="p-4"><p className="font-bold text-gray-900 mb-1 line-clamp-2">{o.title}</p><p className="text-xs text-gray-500 mb-3">{COURSES[o.id].modules.length} modules · {o.provider}</p>
+                                        <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden"><div className="h-full bg-brand-blue" style={{ width: pct + '%' }}></div></div>
+                                        <p className="text-xs text-gray-500 mt-2">{pct === 100 ? 'Completed' : pct === 0 ? 'Start course' : pct + '% complete'}</p></div>
+                                </button>); })}
+                        </div>
+                    )}
+                </div>
+            );
+        };
+
         // --- MAIN APP COMPONENT ---
         const App = () => {
             const [user, setUser] = useState(null);
@@ -1714,6 +1869,18 @@
             const [selectedOpp, setSelectedOpp] = useState(null);
             const [searchQuery, setSearchQuery] = useState('');
             const [notifState, setNotifState] = useState({ custom: [], read: [], dismissed: [] });
+            const [progress, setProgress] = useState({});
+            const [activeCourse, setActiveCourse] = useState(null);
+            const [justEnrolled, setJustEnrolled] = useState(false);
+            useEffect(() => {
+                if (!user) return;
+                try { setProgress(JSON.parse(localStorage.getItem(`kc_courses_${user.id}`) || '{}')); } catch (e) {}
+            }, [user && user.id]);
+            const updateProgress = (oppId, fn) => setProgress(prev => {
+                const next = { ...prev, [oppId]: fn(prev[oppId] || {}) };
+                if (user) { try { localStorage.setItem(`kc_courses_${user.id}`, JSON.stringify(next)); } catch (e) {} }
+                return next;
+            });
 
             useEffect(() => {
                 const savedUser = localStorage.getItem('kc_session');
@@ -1778,6 +1945,13 @@
                     }, ...p.custom]
                 }));
                 setSelectedOpp(null);
+                if (COURSES[opportunity.id]) {
+                    updateProgress(opportunity.id, p => ({ done: [], quiz: {}, ...p }));
+                    updateNotifs(p => ({ ...p, custom: [{ id: `course-${opportunity.id}`, type: 'application', title: 'Course unlocked', body: `Your ${opportunity.title} modules are ready.`, ts: Date.now(), view: 'courses' }, ...p.custom] }));
+                    setActiveCourse(opportunity.id); setJustEnrolled(true);
+                    navigate('courses');
+                    return;
+                }
                 alert(`Successfully applied for: ${opportunity.title}`);
                 navigate('profile'); 
             };
@@ -1808,6 +1982,7 @@
                     case 'business': return <FilteredOpportunitiesView filterType="Livelihood" title="Small Business Resources" subtitle="Grants and loans to start or grow your negosyo." onApply={setSelectedOpp} />;
                     case 'financial': return <FilteredOpportunitiesView filterType="Financial Literacy" title="Financial Literacy" subtitle="Learn how to manage your money better." onApply={setSelectedOpp} />;
                     case 'search': return <SearchResultsView query={searchQuery} onApply={setSelectedOpp} />;
+                    case 'courses': return <CoursesView progress={progress} updateProgress={updateProgress} user={user} activeId={activeCourse} setActiveId={(id) => { setActiveCourse(id); setJustEnrolled(false); }} welcome={justEnrolled} onBrowse={() => navigate('training')} />;
                     case 'messages': return <MessagesView />;
                     case 'profile': return <ProfileView user={user} applications={applications} />;
                     default: return <DashboardView onApply={setSelectedOpp} user={user} />;
@@ -1851,4 +2026,3 @@
     </script>
 </body>
 </html>
-
