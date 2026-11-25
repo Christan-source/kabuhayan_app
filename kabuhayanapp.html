@@ -242,10 +242,10 @@
                 ],
                 highlightsTitle: "What you'll learn",
                 highlights: [
-                    "MS Word, Excel and PowerPoint basics",
-                    "Using the internet, email and online forms",
-                    "Online safety and spotting scams",
-                    "Digital tools like Google Docs and Zoom"
+                    "Computer parts, operating systems, keyboard and mouse",
+                    "Files and folders, internet browsing, email and online safety",
+                    "Documents, spreadsheets and presentations for everyday work",
+                    "Building your own digital work portfolio"
                 ],
                 process: [
                     "Upload your Valid ID and Transcript of Records",
@@ -374,10 +374,10 @@
                 ],
                 highlightsTitle: "What you'll learn",
                 highlights: [
-                    "Espresso preparation and milk steaming",
-                    "Latte art",
-                    "Customer service skills",
-                    "Cafe opening, closing and basic inventory"
+                    "Preparing espresso and texturing milk",
+                    "Preparing and serving espresso-based and brewed coffee",
+                    "Customer service, workplace hygiene and safety",
+                    "Machine maintenance, cashiering and basic inventory"
                 ],
                 process: [
                     "Upload your valid ID",
@@ -501,6 +501,27 @@
         // --- SMALL HELPERS (icons, search, notifications) ---
         // Wrapping the lucide <i> in a keyed <span> keeps React and lucide.createIcons() from fighting
         // over the same DOM node when dropdowns open/close.
+        // --- PROFILE PHOTO ---
+        const AVATAR_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+        // Crops the picture to a centered square and shrinks it, so it is small enough to save in the browser.
+        const resizeImage = (file, size = 320) => new Promise((resolve, reject) => {
+            const url = URL.createObjectURL(file);
+            const img = new Image();
+            img.onload = () => {
+                const s = Math.min(img.width, img.height);
+                const c = document.createElement('canvas');
+                c.width = c.height = size;
+                c.getContext('2d').drawImage(img, (img.width - s) / 2, (img.height - s) / 2, s, s, 0, 0, size, size);
+                URL.revokeObjectURL(url);
+                resolve(c.toDataURL('image/jpeg', 0.85));
+            };
+            img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('unreadable image')); };
+            img.src = url;
+        });
+        const Avatar = ({ src, name, className }) => src
+            ? <img src={src} alt={`${name} profile photo`} className={`${className} rounded-full object-cover`} />
+            : <div className={`${className} bg-brand-blue text-white rounded-full flex items-center justify-center font-bold uppercase`}>{name.charAt(0)}</div>;
+
         const Icon = ({ name, className }) => (
             <span key={name} className="inline-flex shrink-0">
                 <i data-lucide={name} className={className}></i>
@@ -773,7 +794,6 @@
                 { id: 'courses', name: 'My Courses', icon: 'graduation-cap' },
                 { id: 'business', name: 'Small Business Resources', icon: 'store' },
                 { id: 'financial', name: 'Financial Literacy', icon: 'wallet' },
-                { id: 'messages', name: 'Messages', icon: 'message-square' },
                 { id: 'profile', name: 'Profile', icon: 'user' },
             ];
 
@@ -807,7 +827,7 @@
 
         const Topbar = ({
             user, query, onQueryChange, onSearchSubmit, onSelectOpp, hideSuggestions,
-            notifications, unreadCount, onNotifClick, onMarkAllRead, onClearAll, onDismissNotif
+            notifications, unreadCount, onNotifClick, onMarkAllRead, onClearAll, onDismissNotif, avatar
         }) => {
             const [searchOpen, setSearchOpen] = useState(false);
             const [notifOpen, setNotifOpen] = useState(false);
@@ -1074,9 +1094,7 @@
                         </div>
 
                         <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 bg-brand-blue text-white rounded-full flex items-center justify-center font-bold uppercase">
-                                {user.name.charAt(0)}
-                            </div>
+                            <Avatar src={avatar} name={user.name} className="w-10 h-10" />
                             <div className="text-sm">
                                 <p className="font-semibold text-gray-800">{user.name}</p>
                             </div>
@@ -1554,107 +1572,49 @@
             );
         };
 
-        const MessagesView = () => {
-            const [messages, setMessages] = useState([
-                { id: 1, sender: 'bot', text: "Kumusta! I am your Kabuhayan Assistant. How can I help you today? You can ask me about 'Jobs', 'TESDA', 'Grants', or type 'Help'." }
-            ]);
-            const [input, setInput] = useState('');
-            const [isTyping, setIsTyping] = useState(false);
-            const chatEndRef = useRef(null);
-
-            useEffect(() => {
-                chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-            }, [messages, isTyping]);
-
-            const handleSend = (e) => {
-                e.preventDefault();
-                if (!input.trim()) return;
-
-                const userMsg = { id: Date.now(), sender: 'user', text: input };
-                setMessages(prev => [...prev, userMsg]);
-                setInput('');
-                setIsTyping(true);
-
-                setTimeout(() => {
-                    const lowerInput = userMsg.text.toLowerCase();
-                    let botResponse = "I'm not sure about that. Try asking about 'Jobs', 'Training', 'Grants', or type 'Help'.";
-
-                    if (lowerInput.includes('job') || lowerInput.includes('work') || lowerInput.includes('hiring')) {
-                        botResponse = "We currently have Job Openings like 'Service Crew', 'Call Center Agent', and 'Security Guard'. Check the Opportunities tab!";
-                    } else if (lowerInput.includes('tesda') || lowerInput.includes('training') || lowerInput.includes('skill')) {
-                        botResponse = "TESDA offers free Computer Literacy and Barista training! Check the 'Training & Seminars' tab to apply.";
-                    } else if (lowerInput.includes('grant') || lowerInput.includes('business') || lowerInput.includes('negosyo')) {
-                        botResponse = "DTI is offering a Small Business Grant, and CARD MRI has micro-financing for Sari-Sari stores. Go to 'Small Business Resources' to see the requirements.";
-                    } else if (lowerInput.includes('help') || lowerInput.includes('hi') || lowerInput.includes('hello')) {
-                        botResponse = "Hello! I can guide you to Jobs, Trainings, or Livelihood grants. What are you looking for today?";
-                    }
-
-                    setMessages(prev => [...prev, { id: Date.now() + 1, sender: 'bot', text: botResponse }]);
-                    setIsTyping(false);
-                }, 1500);
+        const ProfileView = ({ user, applications, avatar, onAvatarChange }) => {
+            const fileRef = useRef(null);
+            const [photoError, setPhotoError] = useState('');
+            const [busy, setBusy] = useState(false);
+            const choose = () => { if (fileRef.current) fileRef.current.click(); };
+            const onPick = async (e) => {
+                const file = e.target.files && e.target.files[0];
+                e.target.value = '';
+                if (!file) return;
+                setPhotoError('');
+                if (!AVATAR_TYPES.includes(file.type)) { setPhotoError('Please choose a JPG, PNG, WEBP or GIF image.'); return; }
+                if (file.size > MAX_FILE_SIZE) { setPhotoError(`That photo is ${formatFileSize(file.size)}. The maximum size is 5MB.`); return; }
+                setBusy(true);
+                try {
+                    const data = await resizeImage(file);
+                    if (!onAvatarChange(data)) setPhotoError("We couldn't save the photo. Try a smaller image.");
+                } catch (err) {
+                    setPhotoError("That file couldn't be read as an image.");
+                }
+                setBusy(false);
             };
-
-            return (
-                <div className="p-8 max-w-4xl mx-auto pt-28 h-[calc(100vh-2rem)] flex flex-col">
-                    <div className="mb-6">
-                        <h2 className="text-2xl font-bold text-gray-900">Messages</h2>
-                        <p className="text-gray-500">Chat with the Kabuhayan Assistant.</p>
-                    </div>
-
-                    <div className="bg-white rounded-xl shadow-sm border border-gray-100 flex-1 flex flex-col overflow-hidden mb-4">
-                        <div className="bg-gray-50 border-b p-4 flex items-center gap-3">
-                            <div className="w-10 h-10 bg-brand-blue rounded-full flex items-center justify-center text-white">
-                                <i data-lucide="bot" className="w-6 h-6"></i>
-                            </div>
-                            <div>
-                                <h3 className="font-bold text-gray-900">Kabuhayan Assistant</h3>
-                                <p className="text-xs text-green-600 flex items-center gap-1"><span className="w-2 h-2 bg-green-500 rounded-full"></span> Online</p>
-                            </div>
-                        </div>
-
-                        <div className="flex-1 overflow-y-auto p-6 space-y-4 chat-scroll bg-gray-50/50">
-                            {messages.map(msg => (
-                                <div key={msg.id} className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
-                                    <div className={`max-w-[75%] p-3 rounded-2xl text-sm ${msg.sender === 'user' ? 'bg-brand-blue text-white rounded-tr-sm' : 'bg-white border border-gray-200 text-gray-800 rounded-tl-sm shadow-sm'}`}>
-                                        {msg.text}
-                                    </div>
-                                </div>
-                            ))}
-                            {isTyping && (
-                                <div className="flex justify-start">
-                                    <div className="bg-white border border-gray-200 p-3 rounded-2xl rounded-tl-sm shadow-sm flex gap-1">
-                                        <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></span>
-                                        <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></span>
-                                        <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.4s' }}></span>
-                                    </div>
-                                </div>
-                            )}
-                            <div ref={chatEndRef} />
-                        </div>
-
-                        <form onSubmit={handleSend} className="p-4 border-t bg-white flex gap-3">
-                            <input type="text" value={input} onChange={e => setInput(e.target.value)} placeholder="Type a message..." className="flex-1 bg-gray-100 border-none outline-none rounded-full px-4 py-3 text-sm focus:ring-2 focus:ring-brand-blue" />
-                            <button type="submit" className="bg-brand-blue text-white w-12 h-12 rounded-full flex items-center justify-center hover:bg-blue-700 transition-colors shadow-sm">
-                                <i data-lucide="send" className="w-5 h-5 ml-1"></i>
-                            </button>
-                        </form>
-                    </div>
-                </div>
-            );
-        };
-
-        const ProfileView = ({ user, applications }) => {
+            const removePhoto = () => { setPhotoError(''); onAvatarChange(null); };
             return (
                 <div className="p-8 max-w-7xl mx-auto pt-28">
                      <h2 className="text-2xl font-bold text-gray-900 mb-6">My Profile</h2>
                      <div className="grid grid-cols-12 gap-6">
                         <div className="col-span-3">
                             <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex flex-col items-center text-center">
-                                <div className="w-24 h-24 bg-brand-blue text-white rounded-full flex items-center justify-center text-3xl font-bold mb-4 uppercase">
-                                    {user.name.charAt(0)}
+                                <div className="relative mb-4">
+                                    <Avatar src={avatar} name={user.name} className="w-24 h-24 text-3xl" />
+                                    <button type="button" onClick={choose} aria-label="Change profile photo" className="absolute bottom-0 right-0 w-8 h-8 rounded-full bg-white border border-gray-200 shadow flex items-center justify-center text-brand-blue hover:bg-blue-50">
+                                        <Icon name="camera" className="w-4 h-4" />
+                                    </button>
                                 </div>
+                                <input ref={fileRef} type="file" accept="image/png,image/jpeg,image/webp,image/gif" onChange={onPick} className="hidden" />
                                 <h3 className="font-bold text-lg text-gray-900">{user.name}</h3>
                                 <p className="text-sm text-gray-500 mb-4">{user.email}</p>
+                                <div className="flex gap-2 w-full">
+                                    <button type="button" onClick={choose} disabled={busy} className="flex-1 px-3 py-2 rounded-lg text-sm font-semibold text-white bg-brand-blue hover:bg-blue-700 disabled:opacity-60">{busy ? 'Saving...' : avatar ? 'Change photo' : 'Upload photo'}</button>
+                                    {avatar && <button type="button" onClick={removePhoto} className="px-3 py-2 rounded-lg text-sm font-semibold text-red-600 border border-red-200 hover:bg-red-50">Remove</button>}
+                                </div>
+                                {photoError && <p className="text-xs text-red-600 mt-2">{photoError}</p>}
+                                <p className="text-[11px] text-gray-400 mt-2">JPG, PNG, WEBP or GIF, up to 5MB</p>
                             </div>
                         </div>
                         <div className="col-span-5">
@@ -1708,35 +1668,984 @@
 
 
         // --- COURSE MODULES (unlocked after a training application is submitted) ---
-        const L = (t, d, x) => ({ title: t, mins: d, text: x });
+        const L = (t, d, x, label) => ({ title: t, mins: d, text: x, label });
+        // Content block builders for lesson text (a plain string still works as one paragraph)
+        const P = (t) => ({ p: t });
+        const H = (t) => ({ h: t });
+        const UL = (items) => ({ ul: items });          // item = "text" or ["Bold lead", "rest"]
+        const OL = (items) => ({ ol: items });
+        const TBL = (head, rows) => ({ table: { head, rows } });
+        const NOTE = (title, text, items, kind) => ({ note: { title, text, items, kind: kind || 'info' } });
+        const PRE = (t) => ({ pre: t });
+        const VID = (id) => ({ video: id });             // YouTube video id
+        const LVID = (src) => ({ localvideo: src });     // video file stored next to this HTML file
+
+        const Blocks = ({ items }) => {
+            const list = typeof items === 'string' ? [P(items)] : items;
+            const rich = (it) => Array.isArray(it) ? <><span className="font-semibold text-gray-900">{it[0]}:</span> {it[1]}</> : it;
+            const tones = { info: 'bg-blue-50 border-blue-100 text-blue-900', task: 'bg-yellow-50 border-yellow-200 text-yellow-900', tip: 'bg-green-50 border-green-200 text-green-900' };
+            return <>{list.map((b, i) => {
+                if (b.p) return <p key={i} className="text-gray-700 leading-relaxed mb-4">{b.p}</p>;
+                if (b.h) return <h4 key={i} className="font-bold text-gray-900 mt-6 mb-2">{b.h}</h4>;
+                if (b.ul) return <ul key={i} className="list-disc pl-5 space-y-1.5 text-gray-700 leading-relaxed mb-4">{b.ul.map((it, j) => <li key={j}>{rich(it)}</li>)}</ul>;
+                if (b.ol) return <ol key={i} className="list-decimal pl-5 space-y-1.5 text-gray-700 leading-relaxed mb-4">{b.ol.map((it, j) => <li key={j}>{rich(it)}</li>)}</ol>;
+                if (b.pre) return <pre key={i} className="whitespace-pre-wrap font-sans text-sm text-gray-800 bg-gray-50 border border-gray-200 rounded-lg p-4 mb-4">{b.pre}</pre>;
+                if (b.table) return (
+                    <div key={i} className="overflow-x-auto mb-5 rounded-lg border border-gray-200">
+                        <table className="w-full text-sm text-left">
+                            <thead className="bg-gray-50 text-gray-600"><tr>{b.table.head.map((h, j) => <th key={j} className="px-3 py-2 font-semibold">{h}</th>)}</tr></thead>
+                            <tbody>{b.table.rows.map((r, j) => <tr key={j} className="border-t border-gray-100">{r.map((c, k) => <td key={k} className={`px-3 py-2 align-top ${k === 0 ? 'font-medium text-gray-900' : 'text-gray-700'}`}>{c}</td>)}</tr>)}</tbody>
+                        </table>
+                    </div>
+                );
+                if (b.note) return (
+                    <div key={i} className={`rounded-lg border p-4 mb-4 text-sm leading-relaxed ${tones[b.note.kind] || tones.info}`}>
+                        <p className="font-bold mb-1">{b.note.title}</p>
+                        {b.note.text && <p>{b.note.text}</p>}
+                        {b.note.items && <ul className="list-disc pl-5 mt-1 space-y-1">{b.note.items.map((it, j) => <li key={j}>{rich(it)}</li>)}</ul>}
+                    </div>
+                );
+                if (b.localvideo) return (
+                    <div key={i} className="mb-4">
+                        <video className="w-full rounded-xl bg-black" style={{ aspectRatio: '16 / 9' }} controls preload="metadata" playsInline>
+                            <source src={b.localvideo} type="video/mp4" />
+                            Your browser can't play this video.
+                        </video>
+                    </div>
+                );
+                if (b.video) return (
+                    <div key={i} className="mb-4">
+                        <div className="relative w-full overflow-hidden rounded-xl bg-black" style={{ paddingTop: '56.25%' }}>
+                            <iframe className="absolute inset-0 w-full h-full" src={`https://www.youtube.com/embed/${b.video}?rel=0`} title="Course video lesson" frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerPolicy="strict-origin-when-cross-origin" allowFullScreen></iframe>
+                        </div>
+                        <a href={`https://youtu.be/${b.video}`} target="_blank" rel="noopener noreferrer" className="text-sm text-brand-blue font-semibold mt-2 inline-block">Video not playing? Watch it on YouTube</a>
+                    </div>
+                );
+                return null;
+            })}</>;
+        };
+
         const COURSES = {
-            1: { modules: [
-                { title: "Computer Basics", lessons: [
-                    L("Parts of a Computer", 8, "A computer has input devices (keyboard, mouse), a processor that does the work, memory and storage that hold data, and output devices (monitor, printer). Knowing each part helps you troubleshoot and ask for the right help."),
-                    L("Files and Folders", 10, "Files hold your work; folders keep them organized. Give files clear names such as 'Resume_JuanDelaCruz.docx', and save to a folder you can find again. Always back up important files on a USB drive or cloud storage.")],
-                  quiz: { q: "Which device is an INPUT device?", o: ["Monitor", "Keyboard", "Printer"], a: 1 } },
-                { title: "MS Office Essentials", lessons: [
-                    L("Word: Writing a Document", 12, "Use Word to write letters and resumes. Learn to type, change font and size, align text, and use bullet points. Save often with Ctrl+S and export to PDF before sending."),
-                    L("Excel: Simple Tables and Formulas", 12, "Excel stores data in rows and columns. Start a formula with '=' such as =SUM(B2:B6) to add numbers. Useful for budgets, sales lists, and attendance records.")],
-                  quiz: { q: "Which formula adds the cells B2 to B6?", o: ["=ADD(B2-B6)", "=SUM(B2:B6)", "SUM B2:B6"], a: 1 } },
-                { title: "Internet and Digital Tools", lessons: [
-                    L("Safe Browsing and Email", 10, "Use strong passwords, never share OTPs, and check that links are real before clicking. For email, write a clear subject line, a polite greeting, and attach files before sending."),
-                    L("Searching for Jobs Online", 10, "Use job sites and the PESO/PhilJobNet portal to look for openings. Keep your resume updated, and never pay a fee just to be 'hired'. That is a common scam.")],
-                  quiz: { q: "A message asks for your OTP to 'claim a prize'. What should you do?", o: ["Send it quickly", "Ignore it and never share OTPs", "Reply with your ID"], a: 1 } }
+            1: { v: 2,
+                subtitle: "A Practical Upskilling Course for Beginners",
+                about: [
+                    P("Digital skills are useful in many parts of everyday life. People use computers to apply for jobs, prepare reports, communicate with customers, attend online training, keep records, and manage small businesses. This course starts with the basics and builds toward practical tasks you can use outside the classroom."),
+                    P("You do not need to know computer terms before starting. Read each explanation, follow the steps, and repeat the activities until you can complete them with less help. Each module may take 4–6 hours depending on your pace."),
+                    H("How the course is organized"),
+                    TBL(["Module", "Main focus", "Practical result"], [
+                        ["1. Computer Foundations", "Computer parts, basic terms, operating systems, starting and shutting down, keyboard and mouse.", "You can identify basic computer parts and operate a computer safely."],
+                        ["2. Using the Computer and the Internet", "Desktop, applications, files and folders, internet, browsers, searching, email, online safety.", "You can organize files, find information, and communicate online."],
+                        ["3. Digital Productivity for Work", "Word processing, spreadsheets, presentations, workplace tasks, digital portfolio.", "You can prepare simple work documents and records."],
+                        ["4. Final Course Assessment", "Skills checklist, knowledge check, and your personal action plan.", "You know what you can do and what to practice next."]
+                    ]),
+                    H("Learning tips"),
+                    UL([
+                        "Practice on a real computer whenever possible. Watching a demonstration is helpful, but doing the task builds confidence.",
+                        "Go slowly. Repeat a step if it is unfamiliar, and ask for help when needed.",
+                        "Use practice files and sample information. Do not use real passwords, private records, or sensitive customer details during training.",
+                        "Computer screens may look different depending on the Windows version, device, or software. Focus on the task and look for equivalent buttons or menus."
+                    ]),
+                    H("Connection to upskilling"),
+                    P("Upskilling means learning or improving skills so a person can take on new tasks, perform better in a current role, or prepare for future opportunities. Basic computer literacy is a foundation for many other skills, including online customer service, office administration, digital marketing, bookkeeping, and technical training."),
+                    P("Learning approach: explain • demonstrate • practice • apply to a real task."),
+                    NOTE("Reference and content note", "This course is an original educational resource with a beginner-focused teaching approach. Primary reference: Mike, G. U. (2026). Computers for Beginners and Seniors: A User Guide on How to Become an Expert in Computer with Illustrations. Lulu Press. Software menus and features can change, so adjust the steps to the version of Windows and the applications you have.", null, "tip")
+                ],
+                modules: [
+                { title: "Computer Foundations", lessons: [
+                    L("Module Overview", 3, [
+                        P("Module goal: Build confidence in understanding a computer, identifying its main parts, and completing basic start-up and navigation tasks."),
+                        H("Learning outcomes"),
+                        UL([
+                            "Explain what a computer is and describe common ways people use one.",
+                            "Identify common hardware parts and explain their basic functions.",
+                            "Describe the role of software and an operating system.",
+                            "Use the mouse, keyboard, and common keys for basic tasks.",
+                            "Start, sign in to, lock, restart, and shut down a computer appropriately."
+                        ])
+                    ]),
+                    L("Watch: Course Video", 0, [
+                        P("Watch this video lesson, then continue with the written lessons below. You can pause and replay it as many times as you need."),
+                        VID("Cv92bYjFQhw")
+                    ]),
+                    L("Watch: Basic Computer Skills for Beginners", 0, [
+                        P("A step-by-step video about basic computer skills for beginners and aspiring virtual assistants (about 15 minutes). Pause and replay as often as you need, and try the steps on a real computer while you watch."),
+                        LVID("videos/basic-computer-skills.mp4")
+                    ]),
+                    L("1.1 What is a computer?", 8, [
+                        P("A computer is an electronic device that receives information, processes it, stores it, and produces a result. A person gives the computer instructions through a keyboard, mouse, touchscreen, or another input device. The computer follows those instructions using programs."),
+                        P("A simple way to understand the process is the information cycle:"),
+                        TBL(["Step", "Meaning", "Everyday example"], [
+                            ["Input", "Information entered into the computer.", "Typing a job application or entering prices."],
+                            ["Processing", "The computer works with the information.", "A spreadsheet adds the prices."],
+                            ["Output", "The result shown or produced.", "A total appears on the screen or is printed."],
+                            ["Storage", "Information is saved for later use.", "Saving a résumé or sales record."]
+                        ]),
+                        H("Where computers are used"),
+                        UL([
+                            ["Work", "writing reports, preparing schedules, tracking orders, communicating with colleagues, and managing records."],
+                            ["Education and training", "researching topics, completing online lessons, preparing assignments, and joining virtual classes."],
+                            ["Small business", "creating price lists, recording sales, promoting products, and responding to customer messages."],
+                            ["Daily life", "organizing photos, accessing public information, and communicating with family or community groups."]
+                        ]),
+                        NOTE("Upskilling connection", "A job seeker may need to upload a résumé. A shop assistant may need to enter sales information. A community volunteer may need to prepare a list of participants. These tasks all use the same basic computer skills.")
+                    ]),
+                    L("1.2 Understanding computer parts (hardware)", 10, [
+                        P("Hardware means the physical parts of a computer that can be seen and touched. A desktop computer usually has separate parts, while a laptop combines many of them in one device."),
+                        TBL(["Part", "What it does", "Example task"], [
+                            ["Monitor / screen", "Displays text, pictures, and other information.", "Read a document or view a training video."],
+                            ["Keyboard", "Enters letters, numbers, and commands.", "Type a letter or fill in a form."],
+                            ["Mouse / touchpad", "Moves the pointer and selects items.", "Open a folder or select a menu."],
+                            ["System unit / processor", "Contains components that process instructions and help the computer work.", "Runs an application."],
+                            ["Storage drive", "Keeps files and programs when the computer is turned off.", "Stores a résumé or spreadsheet."],
+                            ["Printer", "Produces a paper copy.", "Print an application form."],
+                            ["Speakers / headset", "Play sound or allow private listening.", "Listen to an online lesson."]
+                        ]),
+                        H("Other useful terms"),
+                        UL([
+                            ["RAM", "temporary working memory used while programs are running. It is different from long-term file storage."],
+                            ["USB port", "a connection used by compatible devices such as a flash drive or mouse."],
+                            ["Battery and charger", "provide power to a laptop."],
+                            ["Wi-Fi adapter", "allows a device to connect to a wireless network when supported."]
+                        ])
+                    ]),
+                    L("1.3 Software and operating systems", 6, [
+                        P("Software is the set of programs and instructions that tell a computer what to do. An operating system (OS) is the main software that manages the computer's hardware and provides the environment where applications run. Windows, macOS, and Linux are examples of desktop operating systems."),
+                        UL([
+                            ["System software", "helps operate and manage the computer. The operating system is an example."],
+                            ["Application software", "helps users complete tasks, such as writing documents, browsing websites, or editing pictures."]
+                        ]),
+                        P("A program or app is not the same as a file. A word-processing app creates or edits a document file. A spreadsheet app creates or edits a spreadsheet file.")
+                    ]),
+                    L("1.4 Keyboard and mouse basics", 10, [
+                        P("The keyboard is used to enter text and commands. The mouse or touchpad controls the pointer on the screen. Practice these actions slowly:"),
+                        UL([
+                            ["Click", "press the left mouse button once to select an item."],
+                            ["Double-click", "press the left button twice quickly to open many desktop items."],
+                            ["Right-click", "open a menu of additional options."],
+                            ["Scroll", "move through a page or list."],
+                            ["Drag", "hold the button while moving an item, then release."]
+                        ]),
+                        H("Common keys"),
+                        TBL(["Key", "Common use"], [
+                            ["Enter", "Starts a new line or confirms a selection."],
+                            ["Spacebar", "Adds a space between words."],
+                            ["Backspace / Delete", "Removes text or selected items. Check what is selected before deleting."],
+                            ["Shift", "Types a capital letter or the upper symbol on a key."],
+                            ["Caps Lock", "Turns capital-letter typing on or off."],
+                            ["Tab", "Moves to the next field or creates an indent in some apps."],
+                            ["Arrow keys", "Moves the cursor or selection."]
+                        ]),
+                        H("Helpful keyboard shortcuts"),
+                        TBL(["Shortcut", "Action"], [
+                            ["Ctrl + C", "Copy selected text or item."],
+                            ["Ctrl + V", "Paste copied or cut content."],
+                            ["Ctrl + X", "Cut selected content."],
+                            ["Ctrl + Z", "Undo the last action in many applications."],
+                            ["Ctrl + S", "Save the current file in many applications."],
+                            ["Alt + Tab", "Switch between open applications."]
+                        ])
+                    ]),
+                    L("1.5 Starting and ending a computer session", 6, [
+                        OL([
+                            "Check that the computer is connected to power if needed.",
+                            "Press the power button once and wait for the computer to start.",
+                            "If a sign-in screen appears, use your own authorized account. Never share your password.",
+                            "When finished, save your work and close open applications.",
+                            "Use the operating system's Power menu to choose Shut down or Restart. Do not regularly force the computer off by holding the power button."
+                        ]),
+                        P("Lock the screen when stepping away from a shared computer. On many Windows computers, Windows key + L locks the session.")
+                    ]),
+                    L("Guided Practice: Meet Your Computer", 20, [
+                        UL([
+                            "Point to the screen, keyboard, touchpad or mouse, power button, and available ports.",
+                            "Open a simple application such as Notepad or a text editor.",
+                            "Type your name, today's practice date, and one digital skill you want to learn.",
+                            "Save the file using a practice name such as My_First_Practice.txt, if the trainer has shown you how."
+                        ]),
+                        NOTE("Performance task", "Identify five computer parts, explain what each one does, open a basic application, type a short note, and end the session correctly.", null, "task")
+                    ], "min practice")],
+                  quiz: [
+                    { q: "What are the four stages of the basic information cycle?", o: ["Input, processing, output, and storage", "Typing, printing, saving, and deleting", "Start, sign in, lock, and shut down"], a: 0 },
+                    { q: "What is the difference between hardware and software?", o: ["Software is the physical part you can touch; hardware is the programs", "Hardware is the physical parts of a computer; software is the programs and instructions", "They are the same thing"], a: 1 },
+                    { q: "What does an operating system do?", o: ["It only prints documents", "It manages the computer's hardware and provides the environment where applications run", "It only connects the computer to the internet"], a: 1 },
+                    { q: "Which choice lists two input devices and one output device?", o: ["Monitor and printer (input); keyboard (output)", "Speakers and printer (input); mouse (output)", "Keyboard and mouse (input); monitor (output)"], a: 2 },
+                    { q: "Why should you save your work before shutting down?", o: ["So your work is kept for later instead of being lost", "So the computer runs faster next time", "Saving is not needed because shutting down does it for you"], a: 0 }
+                  ] },
+
+                { title: "Using the Computer and the Internet", lessons: [
+                    L("Module Overview", 3, [
+                        P("Module goal: Use the desktop, applications, files, folders, web browsers, search tools, and email to complete common digital tasks safely."),
+                        H("Learning outcomes"),
+                        UL([
+                            "Navigate the desktop, Start menu, taskbar, and application windows.",
+                            "Create, name, save, find, copy, move, and organize files and folders.",
+                            "Explain what the internet and a web browser are.",
+                            "Search for information and check whether a source is trustworthy.",
+                            "Compose a clear email and recognize common online risks."
+                        ])
+                    ]),
+                    L("2.1 Understanding the desktop", 6, [
+                        P("The desktop is the main workspace shown after signing in. On a Windows computer, common areas include the Start menu, taskbar, search, desktop icons, notification area, and open application windows. The exact appearance may differ depending on settings and Windows version."),
+                        UL([
+                            ["Start menu", "provides access to apps, settings, and power options."],
+                            ["Taskbar", "shows pinned and currently open applications."],
+                            ["Search", "helps locate applications, settings, and files."],
+                            ["Window controls", "minimize, maximize or restore, and close a window."]
+                        ]),
+                        NOTE("Practice", "Open the Start menu, locate a simple application, open it, minimize it, restore it, and close it.", null, "tip")
+                    ]),
+                    L("2.2 Applications and settings", 6, [
+                        P("Applications help you perform specific tasks. Examples include a browser for websites, a word processor for documents, a spreadsheet program for calculations, and a media player for audio or video. Install applications only when permitted and from trusted, official sources. On a shared or work computer, ask the administrator before changing settings or installing software."),
+                        P("Useful settings include display brightness, sound, Wi-Fi, accessibility, date and time, and language. Accessibility features, such as magnification, larger text, captions, and screen readers, can make computers easier to use for people with different needs.")
+                    ]),
+                    L("2.3 Files, folders, and storage", 12, [
+                        P("A file is a saved item, such as a document, image, or spreadsheet. A folder is a container used to group files. Organizing files makes it easier to find work later and reduces the chance of losing important information."),
+                        H("Common file types"),
+                        TBL(["Extension", "Common file", "Possible use"], [
+                            [".docx", "Word document", "Letters, résumés, and reports."],
+                            [".xlsx", "Excel workbook", "Lists, budgets, and sales records."],
+                            [".pptx", "PowerPoint presentation", "Training or project presentations."],
+                            [".pdf", "Portable Document Format", "Documents shared for viewing or printing."],
+                            [".jpg / .png", "Image files", "Photos, scans, and graphics."],
+                            [".txt", "Plain text file", "Simple notes without complex formatting."]
+                        ]),
+                        H("A simple file-management routine"),
+                        OL([
+                            "Create a main folder for a project, course, or work task.",
+                            "Create smaller folders when needed, such as Documents, Images, and Reports.",
+                            "Use clear names that explain the file, for example: Customer_List_Practice or Job_Application_Draft.",
+                            "Save the file in the correct folder and remember where it is stored.",
+                            "Use search or File Explorer to find it later.",
+                            "Keep a backup of important work in an approved location, such as a trusted cloud account or external storage device."
+                        ]),
+                        P("Be careful when moving or deleting files. Check the file name and location first. Emptying the recycle bin or permanently deleting a file may make recovery difficult.")
+                    ]),
+                    L("2.4 Connecting to the internet", 8, [
+                        P("The internet is a worldwide network that allows devices to exchange information. A device may connect through Wi-Fi, a wired network connection, or a mobile hotspot. A browser is an application used to open websites. Examples include Microsoft Edge, Google Chrome, Mozilla Firefox, and Safari."),
+                        P("A website address is also called a URL. A search engine helps people find webpages based on words or questions they enter. Search results are not automatically reliable, so users must check the source."),
+                        H("Searching more effectively"),
+                        UL([
+                            "Use clear words that describe what you need. Example: basic résumé format for entry-level applicant.",
+                            "Add a location or date when the information depends on place or time.",
+                            "Compare information from more than one trustworthy source.",
+                            "Check the author or organization, publication date, evidence, and purpose of the page.",
+                            "Be cautious of pages that make unrealistic promises, pressure you to act quickly, or request unnecessary personal information."
+                        ])
+                    ]),
+                    L("2.5 Email and professional communication", 8, [
+                        P("Email is commonly used for applications, work updates, training notices, and customer communication. A professional email should have a useful subject, a polite greeting, a clear message, and an appropriate closing."),
+                        H("Basic email parts"),
+                        UL([
+                            ["To", "the intended recipient."],
+                            ["Subject", "a short description of the message."],
+                            ["Greeting", "for example, \"Good day\" or \"Hello\"."],
+                            ["Message", "explain the purpose in clear and respectful language."],
+                            ["Attachment", "a file included with the email. Check that the correct file is attached."],
+                            ["Closing", "for example, \"Thank you\" followed by your name."]
+                        ]),
+                        P("Before sending, check the recipient, spelling, tone, attachment, and whether the message contains private information. Do not send passwords or verification codes by email."),
+                        H("Sample practice email"),
+                        PRE("Subject: Inquiry About Computer Training Schedule\n\nGood day,\n\nI would like to ask for information about the schedule and requirements for the basic computer training program. Please let me know if registration is still open.\n\nThank you for your time.\n[Your Name]")
+                    ]),
+                    L("2.6 Online safety and responsible use", 8, [
+                        UL([
+                            "Use strong, unique passwords and keep them private. A password manager may help when used appropriately.",
+                            "Turn on multi-factor authentication when available.",
+                            "Do not open unexpected attachments or links, especially messages that create urgency or ask for account details.",
+                            "Check website addresses carefully before entering information. Look for the correct organization and a secure connection, but remember that a padlock alone does not prove a site is trustworthy.",
+                            "Use privacy settings and share only the information needed for a task.",
+                            "Sign out of accounts on shared devices and avoid saving passwords on public computers.",
+                            "Keep software and security updates current, following the device owner's or organization's instructions.",
+                            "Respect others online. Do not share another person's photos, contact details, or documents without permission."
+                        ]),
+                        H("Recognizing suspicious messages"),
+                        P("A message may be suspicious if it asks you to reveal a password or one-time code, claims your account will immediately be closed, contains an unexpected attachment, or comes from an address that does not match the organization. If unsure, do not click. Contact the organization through a known official channel or ask a trusted trainer.")
+                    ]),
+                    L("Guided Practice: Organize and Communicate", 25, [
+                        OL([
+                            "Create a folder named Digital_Skills_Practice.",
+                            "Inside it, create folders named Documents, Spreadsheets, and Images.",
+                            "Create a short text note and save it inside Documents.",
+                            "Use a browser to find an official website that provides a public service or learning information.",
+                            "Write down the organization name, page title, and date you checked the information.",
+                            "Draft a professional email asking about a training course. Do not send it unless the trainer asks you to."
+                        ]),
+                        NOTE("Performance task", "Organize a practice folder, locate a reliable online source, and prepare a professional email draft with a clear subject and message.", null, "task")
+                    ], "min practice")],
+                  quiz: [
+                    { q: "What is the difference between a file and a folder?", o: ["A file is a container; a folder is a saved document", "A file is a saved item such as a document; a folder is a container that groups files", "There is no difference"], a: 1 },
+                    { q: "What is the purpose of a web browser?", o: ["To open and view websites", "To store files when the computer is off", "To print documents"], a: 0 },
+                    { q: "Which two things should you check when judging whether a website is reliable?", o: ["The page color and the font", "The author or organization, and the publication date", "How many ads appear and how fast it loads"], a: 1 },
+                    { q: "What should a professional email include?", o: ["A useful subject, a polite greeting, a clear message, and an appropriate closing", "Only an attachment with no message", "Your password so the receiver can verify you"], a: 0 },
+                    { q: "A message asks for your password or verification code. What should you do?", o: ["Send it if the message says it is urgent", "Do not click or reply; contact the organization through a known official channel or ask a trusted trainer", "Reply with just the first half of the code"], a: 1 }
+                  ] },
+
+                { title: "Digital Productivity for Work", lessons: [
+                    L("Module Overview", 3, [
+                        P("Module goal: Apply computer skills to create useful documents, organize simple information, and present ideas clearly for work, training, or small-business activities."),
+                        H("Learning outcomes"),
+                        UL([
+                            "Create and format a basic document using a word processor.",
+                            "Use a spreadsheet to enter, organize, and calculate simple information.",
+                            "Create a short presentation with clear and readable slides.",
+                            "Choose the right digital tool for a common task.",
+                            "Prepare a small digital portfolio that demonstrates practical skills."
+                        ])
+                    ]),
+                    L("3.1 Word processing for everyday work", 8, [
+                        P("A word processor is an application used to create and edit text documents. Examples include Microsoft Word, Google Docs, and LibreOffice Writer. People use word processors to prepare letters, résumés, reports, meeting notes, instructions, and forms."),
+                        H("Basic document workflow"),
+                        OL([
+                            "Open the word-processing application and create a blank document.",
+                            "Type the content before spending too much time on its appearance.",
+                            "Use headings to separate sections and make the document easier to read.",
+                            "Use a readable font and consistent font sizes. Keep spacing and alignment consistent.",
+                            "Check spelling, grammar, names, dates, and contact details.",
+                            "Save the editable file. Export or save a PDF copy when a fixed-layout version is needed."
+                        ]),
+                        H("Useful formatting tools"),
+                        UL([
+                            ["Bold", "highlights important words or headings."],
+                            ["Alignment", "positions text to the left, center, right, or justified."],
+                            ["Bullets and numbering", "organize lists and steps."],
+                            ["Margins and page layout", "control the space and arrangement on a page."],
+                            ["Tables", "organize information into rows and columns."],
+                            ["Spell check", "helps identify possible spelling errors, but the writer must still review the document."]
+                        ]),
+                        NOTE("Work connection", "A job seeker can prepare a résumé. An office assistant can write a memo. A small-business owner can prepare a simple product or service information sheet.")
+                    ]),
+                    L("3.2 Spreadsheets for simple records", 10, [
+                        P("A spreadsheet organizes information in rows and columns. Each box is called a cell. A cell is identified by its column letter and row number, such as A1. Spreadsheets can perform calculations and help users summarize information."),
+                        H("Important spreadsheet terms"),
+                        UL([
+                            ["Workbook", "the spreadsheet file."],
+                            ["Worksheet", "one sheet or tab inside a workbook."],
+                            ["Cell", "one box where data or a formula can be entered."],
+                            ["Row", "a horizontal line of cells."],
+                            ["Column", "a vertical line of cells."],
+                            ["Formula", "an instruction that calculates a result. Many formulas begin with an equals sign."]
+                        ]),
+                        H("Example: simple sales record"),
+                        TBL(["Item", "Quantity", "Price each", "Total"], [
+                            ["Notebook", "3", "₱25", "₱75"],
+                            ["Ballpen", "5", "₱10", "₱50"],
+                            ["Folder", "2", "₱15", "₱30"]
+                        ]),
+                        P("If quantity is in column B and price is in column C, a formula in D2 could be =B2*C2. A total at the bottom could use =SUM(D2:D4). Formula names and separators may differ depending on the spreadsheet application and regional settings."),
+                        H("Useful spreadsheet habits"),
+                        UL([
+                            "Give each column a clear heading.",
+                            "Keep one type of information in each column.",
+                            "Use consistent date and currency formats.",
+                            "Check formulas and totals before relying on them.",
+                            "Do not enter real customer, employee, or financial information into practice files."
+                        ]),
+                        NOTE("Work connection", "Spreadsheets can help a shop track sample inventory, a community group record attendance, or a trainee organize a simple budget.")
+                    ]),
+                    L("3.3 Presentations and sharing information", 6, [
+                        P("A presentation application helps organize ideas into slides. Examples include Microsoft PowerPoint, Google Slides, and LibreOffice Impress. Presentations may be used for training, project proposals, reports, and business introductions."),
+                        P("A clear presentation usually has a beginning, middle, and ending:"),
+                        UL([
+                            ["Opening", "title, presenter, and purpose."],
+                            ["Main section", "a few key points supported by examples or visuals."],
+                            ["Closing", "summary, recommendation, or next step."]
+                        ]),
+                        P("Keep slides readable. Use short phrases rather than long paragraphs, choose a consistent layout, and use images only when they support the message. Check spelling and make sure any image or information is appropriate to use.")
+                    ]),
+                    L("3.4 Choosing the right tool", 5, [
+                        TBL(["Task", "Use this type of tool", "Example output"], [
+                            ["Write a formal letter", "Word processor", "A letter saved as DOCX and PDF."],
+                            ["Calculate a weekly total", "Spreadsheet", "A table with formulas."],
+                            ["Explain a project to a group", "Presentation app", "A short slide deck."],
+                            ["Find current training information", "Browser and search engine", "A list of verified information sources."],
+                            ["Send an application inquiry", "Email app", "A clear, polite email."]
+                        ])
+                    ]),
+                    L("3.5 Digital skills for employability and small business", 6, [
+                        P("Basic digital skills can support many types of work. The exact software used may differ between employers, but the general abilities are transferable: typing, saving files, searching for information, communicating clearly, following instructions, and checking work for errors."),
+                        UL([
+                            ["Job seekers", "prepare a résumé, save documents as PDF, search for vacancies through legitimate sources, and communicate professionally."],
+                            ["Employees", "prepare reports, organize files, update simple records, and participate in online training."],
+                            ["Small-business owners", "prepare price lists, record sample sales, create product information, and respond to customer inquiries."],
+                            ["Community learners", "prepare attendance sheets, information notices, schedules, and simple presentations."]
+                        ]),
+                        P("Digital skills do not guarantee employment, but they can help learners complete common tasks and prepare for further training.")
+                    ]),
+                    L("Final Practical Project: My Digital Work Portfolio", 45, [
+                        P("Create a folder named My_Digital_Work_Portfolio. Save the following practice outputs inside it:"),
+                        OL([
+                            "Document: Create a one-page résumé draft or professional profile using sample contact details.",
+                            "Spreadsheet: Create a small sample sales or weekly expense table with at least one calculation formula.",
+                            "Presentation: Create three slides introducing a skill, service, or small project.",
+                            "Email draft: Write a professional message asking about a training opportunity. Do not send it unless instructed.",
+                            "File organization: Place each output in the correct subfolder and use clear file names."
+                        ]),
+                        H("Review your work"),
+                        UL([
+                            "Can another person understand the files?",
+                            "Are the names clear?",
+                            "Are the calculations correct?",
+                            "Is the writing respectful and easy to read?",
+                            "Did you avoid using private information?"
+                        ]),
+                        NOTE("Performance task", "Submit a neatly organized digital portfolio containing a document, a spreadsheet with a working formula, a short presentation, and an email draft.", null, "task")
+                    ], "min practice")],
+                  quiz: [
+                    { q: "What is a word processor used for?", o: ["Creating and editing text documents such as letters and résumés", "Calculating totals in rows and columns", "Searching for websites"], a: 0 },
+                    { q: "What is the difference between a row, a column, and a cell?", o: ["A row is vertical, a column is horizontal, and a cell is a whole sheet", "They all mean the same thing", "A row is a horizontal line of cells, a column is a vertical line of cells, and a cell is one box"], a: 2 },
+                    { q: "What does the formula =B2*C2 calculate?", o: ["It adds B2 and C2", "It multiplies the value in B2 by the value in C2", "It copies B2 into C2"], a: 1 },
+                    { q: "Which choice gives two ways to make a presentation easier to read?", o: ["Use long paragraphs and many different fonts", "Fill every slide with images and small text", "Use short phrases and a consistent layout"], a: 2 },
+                    { q: "Which digital task most directly helps a job seeker?", o: ["Preparing a résumé and saving it as a PDF", "Sharing your password with an employer", "Recording attendance for a community event"], a: 0 },
+                    { q: "Which digital task may help a small-business owner?", o: ["Deleting all files to save space", "Preparing a price list or recording sample sales", "Opening unexpected email attachments"], a: 1 }
+                  ] },
+
+                { title: "Final Course Assessment", lessons: [
+                    L("Practical Skills Checklist", 10, [
+                        P("Check yourself on each skill. You can practice a skill more than once before you feel ready to mark it complete. For every item, ask: can I do this independently, only with help, or not yet?"),
+                        UL([
+                            "Identify the main computer parts.",
+                            "Use the mouse or touchpad and keyboard.",
+                            "Open and close an application.",
+                            "Create and organize folders.",
+                            "Save and find a file.",
+                            "Open a website and search for information.",
+                            "Identify signs of a suspicious message.",
+                            "Prepare a clear email draft.",
+                            "Create and format a basic document.",
+                            "Enter data and use a simple spreadsheet formula.",
+                            "Create a short presentation.",
+                            "Organize a digital work portfolio."
+                        ]),
+                        H("Suggested assessment guide"),
+                        TBL(["Area", "Weight", "What to look for"], [
+                            ["Knowledge check", "20%", "Understands basic terms and safe practices."],
+                            ["Module 1 practical work", "20%", "Can identify parts and operate a computer."],
+                            ["Module 2 practical work", "25%", "Can manage files, browse, and draft email safely."],
+                            ["Module 3 portfolio", "35%", "Can create and organize useful digital outputs."]
+                        ])
+                    ], "min practice"),
+                    L("Personal Upskilling Action Plan", 10, [
+                        P("After completing the three modules, choose one digital skill to practice further. Set a small goal and decide how you will know you have improved."),
+                        TBL(["My next skill", "My practice goal"], [
+                            ["Example: improve spreadsheet skills", "Practice entering sample records and using SUM and multiplication formulas twice a week."]
+                        ]),
+                        P("Write down your own answers to these prompts:"),
+                        UL([
+                            "My chosen skill.",
+                            "My goal.",
+                            "How I will check my progress.",
+                            "Target date.",
+                            "Who or what can support my learning?"
+                        ]),
+                        H("Possible next learning paths"),
+                        UL([
+                            ["Office productivity", "more advanced Word formatting, spreadsheet formulas, charts, and presentations."],
+                            ["Employment preparation", "résumé writing, online application skills, workplace communication, and file sharing."],
+                            ["Small-business digital skills", "inventory records, basic bookkeeping, product catalogs, and customer communication."],
+                            ["Digital confidence", "online safety, cloud storage, accessibility tools, and responsible use of digital services."]
+                        ])
+                    ])],
+                  quiz: [
+                    { q: "Which part of a computer is commonly used to type text?", o: ["Monitor", "Keyboard", "Speakers"], a: 1 },
+                    { q: "What is the main role of an operating system?", o: ["It manages computer resources and allows applications to run", "It creates spreadsheets", "It only protects against scams"], a: 0 },
+                    { q: "What is the difference between RAM and long-term storage?", o: ["They are exactly the same", "RAM keeps files when the computer is off; storage is temporary", "RAM is temporary working memory; long-term storage keeps files and programs"], a: 2 },
+                    { q: "What is a folder used for?", o: ["To group and organize files", "To browse websites", "To send email"], a: 0 },
+                    { q: "Which application type is commonly used to open websites?", o: ["A spreadsheet", "A web browser", "A presentation app"], a: 1 },
+                    { q: "Why should you check the source and date of online information?", o: ["To make the page load faster", "To check whether the information is trustworthy and current", "Dates and sources do not matter"], a: 1 },
+                    { q: "What should you do before sending an email attachment?", o: ["Confirm that it is the correct file and that it is appropriate to share", "Rename it to a random name", "Nothing, attachments are always correct"], a: 0 },
+                    { q: "Why should passwords and one-time verification codes be kept private?", o: ["They are only used for fun", "They can be used to access personal accounts", "They expire if you read them"], a: 1 },
+                    { q: "Which type of application is best for organizing numbers and calculations?", o: ["A media player", "A web browser", "A spreadsheet application"], a: 2 },
+                    { q: "What does the spreadsheet formula =SUM(B2:B6) do?", o: ["It adds the values in cells B2 through B6", "It multiplies B2 by B6", "It counts the letters in B2"], a: 0 }
+                  ] }
             ]},
-            6: { modules: [
-                { title: "Coffee Basics", lessons: [
-                    L("Beans and Roasts", 8, "Arabica is smooth and slightly sweet; Robusta is stronger and more bitter. Light roasts taste fruity, dark roasts taste bold and smoky. Barako from Batangas is a proud local Liberica variety."),
-                    L("Brewing Methods", 10, "Common methods include drip, French press, pour-over, and espresso. Each needs a different grind size and brew time. Coarse grind for French press, fine grind for espresso.")],
-                  quiz: { q: "Which grind size suits a French press?", o: ["Coarse", "Extra fine", "Powder"], a: 0 } },
-                { title: "Espresso and Milk Drinks", lessons: [
-                    L("Pulling an Espresso Shot", 12, "A standard shot uses about 18g of ground coffee and takes 25 to 30 seconds. Tamp evenly, lock in the portafilter, and watch the golden crema. A shot that runs too fast tastes sour; too slow tastes bitter."),
-                    L("Steaming Milk", 12, "Keep the steam wand tip just under the milk surface to add air, then lower it to swirl. Stop at about 60 to 65 degrees Celsius. Latte has little foam; cappuccino has more.")],
-                  quiz: { q: "An espresso shot that runs too fast usually tastes:", o: ["Sour", "Bitter", "Sweet"], a: 0 } },
-                { title: "Service and Hygiene", lessons: [
-                    L("Taking Orders and Handling Customers", 8, "Greet with a smile, repeat the order back, and suggest add-ons politely. If a drink is wrong, apologize and remake it quickly. Calm, friendly service brings customers back."),
-                    L("Food Safety and Cleanliness", 8, "Wash your hands often, wear a hair net and apron, and sanitize the bar and tools between orders. Wipe the steam wand after every use and keep milk refrigerated.")],
-                  quiz: { q: "When should you wipe the steam wand?", o: ["End of week", "After every use", "Only when dirty"], a: 1 } }
+            6: { v: 2,
+                subtitle: "Barista NC II · Tourism Sector (Hotel and Restaurant)",
+                about: [
+                    P("The Barista NC II qualification consists of the competencies a person must achieve to deliver good-quality coffee in commercially operated cafes or specialty coffee shops. It is specific to a person who specializes in making coffee beverages. A person who achieves this qualification is competent to work as a Barista."),
+                    P("The course is designed to enhance your knowledge, skills and attitude in line with industry standards. It covers core competencies on preparing espresso, texturing milk, preparing and serving coffee beverages, performing basic maintenance of machines and equipment, and performing basic cashiering and general control procedures."),
+                    H("How the course is organized"),
+                    TBL(["Module", "Units covered", "Practical result"], [
+                        ["1. Basic Competencies", "Workplace communication, teamwork, career professionalism, occupational health and safety.", "You can communicate, cooperate and work safely in a workplace."],
+                        ["2. Common Competencies", "Industry knowledge, hygiene, computer operations, workplace safety practices, customer service.", "You can follow hygiene and safety rules and serve customers well."],
+                        ["3. Prepare Espresso", "Set up, dose and tamp, extract.", "You can prepare a perfect shot of espresso."],
+                        ["4. Texture Milk", "Prepare milk and equipment, foam, steam.", "You can steam milk to the right volume, texture and temperature."],
+                        ["5. Prepare and Serve Coffee Beverages", "Taking orders, espresso-based drinks, brewed coffee.", "You can prepare and serve standard hot and cold coffee drinks."],
+                        ["6. Maintenance, Cashiering and Control", "Machine and grinder care, POS, payments, petty cash, par stock.", "You can keep the bar clean and the sales and stock records in order."]
+                    ]),
+                    H("Before you start"),
+                    UL([
+                        "Training for this qualification is competency-based. You learn by doing, so practice each step on real equipment whenever you can.",
+                        "Trainee entry requirements: completed 10-year basic education, and good in oral and written communication.",
+                        "Basic and common units are taught alongside the core units, because the core units are the focus of assessment."
+                    ]),
+                    NOTE("Source", "Course content follows TESDA's Training Regulations for Barista NC II (Tourism Sector, Hotel and Restaurant; promulgated December 2013). Always follow your training center's and employer's own standards, and your trainer's instructions.", null, "tip")
+                ],
+                modules: [
+                { title: "Basic Competencies", lessons: [
+                    L("1.1 Participate in Workplace Communication", 8, [
+                        P("This unit covers the knowledge, skills and attitudes required to gather, interpret and convey information in response to workplace requirements."),
+                        H("Obtain and convey workplace information"),
+                        UL([
+                            "Get specific, relevant information from appropriate sources such as team members, suppliers, trade personnel, local government and industry bodies.",
+                            "Use effective questioning, active listening and speaking skills.",
+                            "Use an appropriate medium, such as a memorandum, notice, face-to-face talk, or follow-up or verbal instructions.",
+                            "Use appropriate non-verbal communication.",
+                            "Follow the proper lines of communication with supervisors and colleagues.",
+                            "Keep personal interaction clear and concise."
+                        ]),
+                        H("Participate in workplace meetings and discussions"),
+                        UL([
+                            "Attend team meetings on time.",
+                            "Express your own opinions clearly and listen to others without interruption.",
+                            "Keep your inputs consistent with the purpose of the meeting.",
+                            "Be courteous in all workplace interactions.",
+                            "Ask and answer questions about simple routine procedures and working conditions.",
+                            "Understand and carry out the outcomes of the meeting."
+                        ]),
+                        H("Complete relevant work-related documents"),
+                        UL([
+                            "Fill in employment forms accurately and legibly.",
+                            "Record workplace data on standard forms and documents.",
+                            "Use basic mathematics (addition, subtraction, multiplication and division) for routine calculations.",
+                            "Find and correct errors in recorded information.",
+                            "Complete reports for your supervisor according to organizational guidelines."
+                        ])
+                    ]),
+                    L("1.2 Work in a Team Environment", 6, [
+                        P("This unit covers the skills, knowledge and attitudes needed to identify your role and responsibility as a member of a team."),
+                        H("Describe team role and scope"),
+                        UL([
+                            "Identify the role and objective of the team from available sources of information.",
+                            "Identify team parameters, reporting relationships and responsibilities from team discussions and other sources."
+                        ]),
+                        H("Identify your own role and responsibility within the team"),
+                        UL([
+                            "Know your individual role and responsibilities.",
+                            "Know and recognize the roles and responsibilities of other team members.",
+                            "Know the reporting relationships within the team and outside it."
+                        ]),
+                        H("Work as a team member"),
+                        UL([
+                            "Communicate appropriately and take part in team activities and objectives.",
+                            "Contribute to the team based on your own skills and the workplace context.",
+                            "Follow reporting protocols using standard operating procedures.",
+                            "Help develop team work plans based on the team's role and each member's competencies."
+                        ])
+                    ]),
+                    L("1.3 Practice Career Professionalism", 6, [
+                        P("This unit covers the knowledge, skills and attitudes for promoting career growth and advancement."),
+                        H("Integrate personal objectives with organizational goals"),
+                        UL([
+                            "Pursue personal growth and work plans that improve your qualifications.",
+                            "Maintain good relationships with yourself and others, guided by performance evaluation.",
+                            "Show commitment to the organization and its goals in your duties."
+                        ]),
+                        H("Set and meet work priorities"),
+                        UL([
+                            "Prioritize competing demands to meet personal, team and organizational goals.",
+                            "Use resources efficiently and effectively.",
+                            "Follow practices for the economical use and upkeep of equipment and facilities."
+                        ]),
+                        H("Maintain professional growth and development"),
+                        UL([
+                            "Identify and take up trainings and career opportunities that fit your job.",
+                            "Seek and show recognitions as proof of career advancement.",
+                            "Obtain and renew licenses or certifications relevant to your job and career, such as National Certificates."
+                        ])
+                    ]),
+                    L("1.4 Practice Occupational Health and Safety", 10, [
+                        P("This unit covers the outcomes required to comply with regulatory and organizational requirements for occupational health and safety (OHS)."),
+                        H("Identify hazards and risks"),
+                        P("Know the safety rules and hazard control practices of your workplace, and be able to spot hazards and their warning signs so that risk to co-workers, the workplace and the environment is reduced."),
+                        TBL(["Type of hazard", "Examples"], [
+                            ["Physical", "Impact, illumination, pressure, noise, vibration, temperature, radiation."],
+                            ["Biological", "Bacteria, viruses, plants, parasites, mites, molds, fungi, insects."],
+                            ["Chemical", "Dusts, fibers, mists, fumes, smoke, gases, vapors."],
+                            ["Ergonomic", "Over-exertion, awkward or static positions, fatigue, monotony."]
+                        ]),
+                        H("Evaluate hazards and risks"),
+                        UL([
+                            "Know the maximum tolerable limits that, when exceeded, cause harm or damage.",
+                            "Determine the effects of the hazards.",
+                            "Report OHS issues and identified hazards to the designated personnel."
+                        ]),
+                        H("Control hazards and risks"),
+                        UL([
+                            "Follow OHS procedures for controlling hazards and risks.",
+                            "Follow procedures for accidents, fire and other emergencies.",
+                            "Use personal protective equipment (PPE) correctly: mask, gloves, goggles, hair net or cap, face shield, ear muffs, apron or gown.",
+                            "Give appropriate help during a workplace emergency, following your organization's protocol."
+                        ]),
+                        P("Contingency measures during emergencies may include evacuation, isolation, decontamination and calling emergency personnel."),
+                        H("Maintain OHS awareness"),
+                        UL([
+                            "Take part in emergency drills and trainings, such as fire drill, earthquake drill, basic life support or CPR, first aid and spillage control.",
+                            "Complete and update your OHS records, such as medical and health records, incident reports, accident reports and trainings completed."
+                        ])
+                    ])],
+                  quiz: [
+                    { q: "During a workplace meeting, which is the correct way to treat other people's opinions?", o: ["Interrupt when you disagree", "Listen without interrupting, while clearly expressing your own opinion", "Stay silent and never share your own opinion"], a: 1 },
+                    { q: "Which of these is a biological hazard?", o: ["Noise and vibration", "Dusts and fumes", "Bacteria, viruses and molds"], a: 2 },
+                    { q: "Which set lists examples of personal protective equipment (PPE)?", o: ["Gloves, hair net and apron", "Stopwatch, tamper and steaming pitcher", "Memo, notice and circular"], a: 0 },
+                    { q: "You notice an unsafe condition at work. What should you do?", o: ["Ignore it if it is not your task", "Report it to the designated personnel", "Wait for it to fix itself"], a: 1 },
+                    { q: "As a team member, which should you identify?", o: ["Only your own schedule", "Only the supervisor's pay", "Your own role and responsibilities, and those of other team members"], a: 2 },
+                    { q: "Which is part of practicing career professionalism?", o: ["Taking up job-related trainings and renewing certifications", "Skipping performance evaluations", "Avoiding new responsibilities"], a: 0 }
+                  ] },
+
+                { title: "Common Competencies", lessons: [
+                    L("2.1 Develop and Update Industry Knowledge", 6, [
+                        P("This unit covers the knowledge, skills and attitude needed to access, increase and update your knowledge of the industry."),
+                        H("Seek information on the industry"),
+                        UL([
+                            "Know where to find information: media, reference books, libraries, unions, industry associations, industry journals, the internet, and your own observation and experience.",
+                            "Get information that helps you perform well, such as the different sectors of the industry and their services, working conditions, laws that affect the industry (health and safety, hygiene, consumer protection), career opportunities, the work ethic expected, and quality assurance.",
+                            "Apply industry information in your day-to-day work."
+                        ]),
+                        H("Update industry knowledge"),
+                        UL([
+                            "Use informal or formal research to keep your general knowledge current.",
+                            "Share updated knowledge with customers and colleagues, and use it in your daily work."
+                        ])
+                    ]),
+                    L("2.2 Observe Workplace Hygiene Procedures", 8, [
+                        P("This unit covers following hygiene procedures and identifying and preventing hygiene risks."),
+                        H("Follow hygiene procedures"),
+                        UL([
+                            "Safe and hygienic handling of food and beverages.",
+                            "Regular hand washing.",
+                            "Correct food storage.",
+                            "Appropriate and clean clothing.",
+                            "Avoiding cross-contamination.",
+                            "Appropriate handling and disposal of garbage.",
+                            "Cleaning and sanitizing procedures.",
+                            "Good personal hygiene."
+                        ]),
+                        H("Identify and prevent hygiene risks"),
+                        UL([
+                            "Common risks include contamination from poor handling of food, food stored incorrectly or at the wrong temperature, food left uncovered, poor personal hygiene, and cross-contamination from poor cleaning practices.",
+                            "Take action to reduce or remove risks within your own responsibility.",
+                            "Report hygiene risks that are beyond your control to the appropriate person for follow-up."
+                        ])
+                    ]),
+                    L("2.3 Perform Computer Operations", 10, [
+                        P("This unit covers the knowledge, skills and attitudes needed to input, access, produce and transfer data using the appropriate hardware and software."),
+                        H("The steps"),
+                        OL([
+                            "Plan and prepare: decide what the task needs, pick the right hardware and software, and follow OH&S guidelines.",
+                            "Input data: enter data into the correct program, check accuracy and save, store files on the right storage media, and work within ergonomic guidelines.",
+                            "Access information: choose the right program, and select, open and close desktop icons (folders, files, network devices, recycle bin) correctly. Use safe keyboard techniques.",
+                            "Produce output: process data using the right commands, print as required, and transfer files between compatible systems.",
+                            "Maintain the system: clean equipment, make regular back-ups, run virus checks, and do basic file maintenance such as deleting unwanted files and freeing disk space."
+                        ]),
+                        NOTE("Tip", "These skills match Modules 1 to 3 of the Computer Literacy course. If you are new to computers, take that course too.", null, "tip")
+                    ]),
+                    L("2.4 Perform Workplace and Safety Practices", 8, [
+                        P("This unit covers following health, safety and security practices, dealing with emergencies, and keeping safe personal presentation standards."),
+                        H("Follow health, safety and security procedures"),
+                        UL([
+                            "Use protective clothing and equipment, safe posture and safe manual handling.",
+                            "Use safe work techniques with knives, equipment, hot surfaces and electronic equipment.",
+                            "Handle chemicals and dangerous materials safely.",
+                            "Keep documents, cash, equipment and people secure.",
+                            "Report breaches such as lost keys, strange or suspicious persons, broken equipment, lost or damaged property, and unsafe work practices."
+                        ]),
+                        H("Deal with emergency situations"),
+                        UL([
+                            "Recognize emergencies such as injuries, fire, electrocution, natural calamities (earthquake or flood) and criminal acts such as robbery.",
+                            "Take action within your scope of responsibility and follow emergency procedures.",
+                            "Ask colleagues for help, and report the details according to enterprise procedure."
+                        ]),
+                        H("Maintain safe personal presentation"),
+                        UL([
+                            "Know and follow your workplace's personal presentation and dress code standards.",
+                            "Practice proper garbage disposal, safety measures and 5S implementation."
+                        ])
+                    ]),
+                    L("2.5 Provide Effective Customer Service", 10, [
+                        P("This unit covers greeting customers, identifying their needs, delivering service, handling queries by telephone, internet and email, and handling complaints."),
+                        H("Greet customers"),
+                        UL([
+                            "Greet guests according to enterprise procedure.",
+                            "Use verbal and non-verbal communication that fits the situation, and observe the customer's non-verbal cues.",
+                            "Show sensitivity to cultural and social differences."
+                        ]),
+                        H("Identify customer needs"),
+                        UL([
+                            "Use interpersonal skills to find out accurately what the customer needs.",
+                            "Judge how urgent each need is so you can set priorities.",
+                            "Give customers information. If a need is beyond your limits, ask your supervisor for help.",
+                            "Be ready to help customers with a disability, special cultural or language needs, unaccompanied children, parents with young children, and pregnant women."
+                        ]),
+                        H("Deliver service"),
+                        UL([
+                            "Attend to customers promptly according to enterprise procedure.",
+                            "Keep a good rapport with customers for high-quality service.",
+                            "Take opportunities to improve the quality of service and products."
+                        ]),
+                        H("Handle queries"),
+                        UL([
+                            "Use the telephone, computer and internet efficiently to find out what customers need.",
+                            "Record queries according to enterprise procedure, and act on them promptly and correctly."
+                        ]),
+                        H("Handle complaints"),
+                        UL([
+                            "Greet the guest with a smile and eye-to-eye contact.",
+                            "Take responsibility for resolving the complaint within the limit of your responsibility.",
+                            "Establish and agree on the nature and details of the complaint with the customer.",
+                            "Take appropriate action to resolve it to the customer's satisfaction wherever possible."
+                        ])
+                    ])],
+                  quiz: [
+                    { q: "Which is a good hygiene procedure?", o: ["Leaving food uncovered", "Regular hand washing and avoiding cross-contamination", "Using one rag for every surface"], a: 1 },
+                    { q: "Which is an example of a hygiene risk?", o: ["Food left uncovered", "Wearing clean clothing", "Storing food correctly"], a: 0 },
+                    { q: "What should you do about a hygiene risk that is beyond your control?", o: ["Ignore it", "Hide it from customers", "Report it to the appropriate person for follow-up"], a: 2 },
+                    { q: "Which routine helps protect computer data?", o: ["Regular back-ups and virus checks", "Sharing your password", "Never saving files"], a: 0 },
+                    { q: "A guest has a complaint. What is the right response?", o: ["Tell the guest to come back later", "Greet with a smile and eye contact, take responsibility within your limits, and agree on the details of the complaint", "Argue that the guest is wrong"], a: 1 },
+                    { q: "Which can you use to update your industry knowledge?", o: ["Rumors only", "Reference books, industry journals, the internet and your own experience", "Nothing, because industry knowledge never changes"], a: 1 }
+                  ] },
+
+                { title: "Prepare Espresso", lessons: [
+                    L("3.1 Set Up and Prepare Machine and Equipment", 8, [
+                        P("A good shot starts before any coffee is ground. Set up your station like this:"),
+                        OL([
+                            "Pre-heat the cups according to enterprise standards.",
+                            "Wipe the portafilter clean and dry before dosing.",
+                            "Check the grind of the coffee.",
+                            "Grind enough coffee for the shot of espresso.",
+                            "Clean and dry the drip tray.",
+                            "Prepare your rags and use them properly: one for the portafilter basket, the steam wand, the drip tray and the cups."
+                        ]),
+                        H("Know your materials"),
+                        UL([
+                            ["Grind types", "coarse, medium, fine and pulverized."],
+                            ["Portafilters", "single-spout, double-spout and blind."]
+                        ])
+                    ]),
+                    L("3.2 Dose and Tamp Coffee", 8, [
+                        UL([
+                            "Dose the right amount of ground coffee into the portafilter.",
+                            "Apply the right amount of pressure when tamping.",
+                            "Tamp the ground coffee evenly.",
+                            "Wipe the sides and spouts of the portafilter clean before inserting it into the brew head.",
+                            "Keep spillage and wastage of ground beans to a minimum during grinding and dosing."
+                        ]),
+                        TBL(["Measure", "Standard"], [
+                            ["Ground coffee, single shot", "7 to 9 grams"],
+                            ["Ground coffee, double shot", "14 to 18 grams"],
+                            ["Tamping pressure", "30 to 50 lbs"]
+                        ])
+                    ]),
+                    L("3.3 Extract Espresso", 10, [
+                        OL([
+                            "Flush the group head before inserting the portafilter.",
+                            "Insert the portafilter and start brewing immediately.",
+                            "Check the volume of the espresso.",
+                            "Monitor the extraction time.",
+                            "Inspect the crema.",
+                            "Serve the espresso, or use it in a beverage, immediately."
+                        ]),
+                        H("A perfect shot of espresso"),
+                        TBL(["Parameter", "Standard"], [
+                            ["Ground coffee", "7 to 9 grams (single shot)"],
+                            ["Volume", "25 to 35 ml (0.85 to 1.2 oz)"],
+                            ["Water temperature", "195 to 205 °F"],
+                            ["Pressure", "9 to 10 bars"],
+                            ["Extraction time", "20 to 30 seconds"]
+                        ])
+                    ]),
+                    L("Practice: My Espresso Routine", 25, [
+                        P("Using a real espresso machine and grinder if you can, perform the full routine. Your trainer will look for evidence that you:"),
+                        UL([
+                            "Pre-heated the cups before making the shot.",
+                            "Wiped the portafilter clean and dry before dosing.",
+                            "Dosed the correct amount and tamped properly.",
+                            "Wiped and cleaned the portafilter sides and spouts before inserting it.",
+                            "Flushed the group head before inserting the portafilter.",
+                            "Inserted the portafilter and brewed immediately.",
+                            "Checked the volume of the espresso.",
+                            "Monitored the extraction time.",
+                            "Inspected the crema.",
+                            "Served or used the espresso immediately."
+                        ]),
+                        NOTE("Performance task", "Prepare one perfect shot of espresso and explain each step. You may also be asked questions about coffee beans, types of grind and espresso extraction.", null, "task")
+                    ], "min practice")],
+                  quiz: [
+                    { q: "How much ground coffee is used for a single shot of espresso?", o: ["20 to 25 grams", "7 to 9 grams", "1 to 2 grams"], a: 1 },
+                    { q: "How long should espresso extraction take?", o: ["20 to 30 seconds", "5 to 10 seconds", "60 to 90 seconds"], a: 0 },
+                    { q: "In what condition should the portafilter be before dosing?", o: ["Wet", "Filled with water", "Wiped clean and dry"], a: 2 },
+                    { q: "What should you do before inserting the portafilter?", o: ["Flush the group head", "Turn off the machine", "Remove the drip tray"], a: 0 },
+                    { q: "What is the standard volume of an espresso shot?", o: ["100 to 150 ml", "25 to 35 ml", "5 to 10 ml"], a: 1 },
+                    { q: "When should a finished shot be served or used in a drink?", o: ["After resting for 10 minutes", "Later, after reheating", "Immediately"], a: 2 }
+                  ] },
+
+                { title: "Texture Milk", lessons: [
+                    L("4.1 Prepare Milk and Equipment", 8, [
+                        P("Steaming milk well starts with preparation:"),
+                        UL([
+                            "Use chilled milk, and a chilled steaming pitcher.",
+                            "Measure an adequate amount of milk for the kind of drink you are making.",
+                            "Choose the correct size of steaming pitcher (10 oz, 12 oz, 20 oz or 32 oz), based on the amount of milk, the steam capacity of the machine, and the steam wand tip.",
+                            "Flush the steam wand to remove condensed water, then wipe it before steaming.",
+                            "Keep the rags for the steam wand clean and moist."
+                        ])
+                    ]),
+                    L("4.2 Foam Milk", 8, [
+                        UL([
+                            "Position the steam wand at the right depth in the milk.",
+                            "Apply full steam when introducing air into the milk.",
+                            "Judge the hissing sound of air being drawn into the milk.",
+                            "Stretch the milk to the volume of foam you want.",
+                            "Convert the milk into microfoam."
+                        ]),
+                        TBL(["Drink", "Foam volume"], [
+                            ["Latte", "Milk grows by about one-third of its original volume."],
+                            ["Cappuccino", "Milk doubles in volume."]
+                        ])
+                    ]),
+                    L("4.3 Steam Milk", 10, [
+                        UL([
+                            "Angle the steam wand to create a whirlpool effect.",
+                            "Spin the milk until it reaches the desired consistency: silky, velvety, pourable, naturally sweet and glossy, with microfoam bubbles.",
+                            "Steam the milk to the ideal temperature for immediate drinking: 140 to 160 °F (about 60 to 71 °C).",
+                            "Shut off the steam wand about 5 degrees before the desired temperature.",
+                            "Flush and wipe the steam wand right after steaming.",
+                            "Remove big bubbles by swirling the milk and knocking the pitcher on the counter."
+                        ]),
+                        NOTE("Performance task", "Steam a pitcher of milk for a latte and one for a cappuccino. Explain how you judged the foam volume and the temperature.", null, "task")
+                    ])],
+                  quiz: [
+                    { q: "How should the milk and the steaming pitcher be before steaming?", o: ["Chilled", "Warm", "Frozen solid"], a: 0 },
+                    { q: "What should you do with the steam wand before steaming?", o: ["Leave it dirty", "Flush it to remove condensed water, then wipe it", "Dip it in cold water"], a: 1 },
+                    { q: "What does the hissing sound tell you?", o: ["The milk is too hot", "The pitcher is empty", "Air is being drawn into the milk"], a: 2 },
+                    { q: "How much should milk expand for a latte compared with a cappuccino?", o: ["Latte grows by about one-third; cappuccino doubles", "Latte doubles; cappuccino stays the same", "Both stay the same"], a: 0 },
+                    { q: "What is the ideal temperature for steamed milk?", o: ["80 to 100 °F", "140 to 160 °F (about 60 to 71 °C)", "200 to 220 °F"], a: 1 },
+                    { q: "When should you shut off the steam wand?", o: ["After the milk boils", "At exactly 100 °F", "About 5 degrees before the desired temperature"], a: 2 }
+                  ] },
+
+                { title: "Prepare and Serve Coffee Beverages", lessons: [
+                    L("5.1 Take Orders and Prepare Your Mise-en-place", 8, [
+                        P("This unit covers preparing standard coffee beverages, both hot and cold, using the espresso machine and other brewing methods."),
+                        UL([
+                            "Take orders and verify them with the guest or dining service crew.",
+                            "Offer recommendations on coffee beverages.",
+                            "Share general information about the coffee beans: variety, origin, blend, roast level and grind.",
+                            "Complete the mise-en-place for coffee service according to your establishment's standards: prepare the machine or brewing equipment, set cups, saucers and accessories, and ready supplies and condiments."
+                        ])
+                    ]),
+                    L("5.2 Prepare Espresso-Based Beverages", 10, [
+                        UL([
+                            "Prepare hot and cold espresso-based beverages according to your establishment's standard recipes.",
+                            "Use or serve only good, perfect shots of espresso.",
+                            "Choose the right cups, glasses and accessories for the drink.",
+                            "Serve espresso beverages immediately."
+                        ]),
+                        TBL(["Hot beverages", "Cold beverages"], [
+                            ["Espresso", "Mocha frappe"],
+                            ["Americano", "Iced café latte"],
+                            ["Cappuccino", "Iced café mocha"],
+                            ["Café latte", ""],
+                            ["Café mocha", ""]
+                        ]),
+                        H("Cups and glasses"),
+                        P("Espresso cups (demitasse), cappuccino cups, latte cups, Irish glass and parfait glass.")
+                    ]),
+                    L("5.3 Prepare and Serve Brewed Coffee", 8, [
+                        UL([
+                            "Brew coffee using the method the guest wants: French press (plunger), syphon or pour-over.",
+                            "Brew for the ideal brewing time of that method.",
+                            "Weigh or measure the coffee beans according to the brewing method.",
+                            "Serve the brewed coffee immediately."
+                        ]),
+                        NOTE("Performance task", "Prepare one espresso-based drink and one brewed coffee. Describe the beans to a guest (variety, origin, roast level) and serve both correctly.", null, "task")
+                    ])],
+                  quiz: [
+                    { q: "Which of these is a hot espresso-based beverage?", o: ["Mocha frappe", "Iced café latte", "Café mocha"], a: 2 },
+                    { q: "Which are brewing methods for brewed coffee?", o: ["French press, syphon and pour-over", "Frying, boiling and baking", "Tamping, dosing and flushing"], a: 0 },
+                    { q: "Which information about coffee beans can you give a guest?", o: ["Only the price", "Variety, origin, blend, roast level and grind", "Nothing, guests should not ask"], a: 1 },
+                    { q: "Which belongs to mise-en-place for coffee service?", o: ["Counting the day's sales", "Cleaning the grinder blades", "Preparing the machine and setting cups, saucers and accessories"], a: 2 },
+                    { q: "Which shots should be served or used in beverages?", o: ["Only good, perfect shots", "Any shot, even a bad one", "Only the first shot of the day"], a: 0 }
+                  ] },
+
+                { title: "Maintenance, Cashiering and Control", lessons: [
+                    L("6.1 Maintain the Espresso Machine", 10, [
+                        P("Regular maintenance covers cleaning procedures done before and after operating the machine."),
+                        UL([
+                            "Backflush the espresso machine according to its type.",
+                            "Check the group head, gasket and portafilters regularly.",
+                            "Pour clean hot water into the drip tray.",
+                            "Clean the steam wand and wipe it with a clean, moist rag.",
+                            "Use a food-grade cleaning chemical (capsule, powder or tablet form) to backflush and descale the machine.",
+                            "Soak portafilters and baskets in hot water to remove oils.",
+                            "Brush the group head and screen at the end of the day.",
+                            "Check the water softener filter regularly.",
+                            "Use suitable cleaning tools, such as a grinder brush, stiff-bristle toothbrush, screwdrivers and lint-free cloth."
+                        ])
+                    ]),
+                    L("6.2 Clean the Grinder and Care for Small Brewers", 8, [
+                        H("Doser grinder"),
+                        UL([
+                            "Brush grounds off the bottom and the outside of the grinder.",
+                            "Wipe the bean hopper with a clean cloth or paper towel, or wash it in warm water.",
+                            "Brush out the doser chamber, especially the chute area.",
+                            "Check the grinder blades (flat burrs, conical burrs or blades) regularly."
+                        ]),
+                        H("Small brewing devices"),
+                        UL([
+                            "Clean small brewers right after use.",
+                            "Wipe them dry before storage, and store them in their proper places.",
+                            "Wash ceramic and glass brewers with soap after use.",
+                            "Check filters for damage such as holes, tears, clogs or wear."
+                        ])
+                    ]),
+                    L("6.3 Operate the POS and Receive Payments", 10, [
+                        P("This unit covers basic cashiering and general control procedures."),
+                        H("Electronic cash register (ECR) or point-of-sale (POS) system"),
+                        UL([
+                            "Prepare the machine before operating: turn it on and check peripherals, take the opening reading or reset it, and put the cash fund in the cash tray.",
+                            "Enter and record transactions such as ordering, receiving, invoicing and sales.",
+                            "Generate reports at the end of the shift: inventory, spoilage, void and sales.",
+                            "Enter new item data and make back-ups of the database, following enterprise standards."
+                        ]),
+                        H("Receive payments"),
+                        UL([
+                            "Receive and count cash according to enterprise accounting procedures.",
+                            "Give change and count it in front of the guest.",
+                            "Print receipts and give them to the guest."
+                        ])
+                    ]),
+                    L("6.4 Handle Change Funds, Petty Cash and Par Stock", 8, [
+                        H("Change funds and petty cash"),
+                        UL([
+                            "Keep cash funds secure.",
+                            "Prepare cash count reports.",
+                            "Monitor and record expenses."
+                        ]),
+                        H("Maintain par stock of items"),
+                        UL([
+                            "Do a beginning and an ending inventory before and after operations.",
+                            "Request stocks following enterprise procedures.",
+                            "Check issued items against requisition documents.",
+                            "Monitor stock levels using par stocking procedures.",
+                            "Stocks include coffee beans, milk, sugar, bar supplies and flavored syrups."
+                        ])
+                    ]),
+                    L("Next Step: National Assessment", 5, [
+                        P("To earn the Barista NC II National Certificate, you must show competence in all the units of the qualification. Assessment focuses on the core units, while the basic and common units are assessed together with them."),
+                        UL([
+                            "Graduates of formal, non-formal and informal training, including enterprise-based training, may apply for assessment.",
+                            "Experienced workers, whether employed or self-employed, may also apply.",
+                            "Successful candidates are awarded a National Certificate signed by the TESDA Director General."
+                        ]),
+                        NOTE("Reminder", "Ask your TESDA training center about the schedule, venue and fees for assessment.", null, "tip")
+                    ])],
+                  quiz: [
+                    { q: "What should be soaked in hot water to remove oils?", o: ["The steam wand", "The drip tray", "Portafilters and baskets"], a: 2 },
+                    { q: "When should the group head and screen be brushed?", o: ["At the end of the day", "Once a year", "Never"], a: 0 },
+                    { q: "When should small brewers be cleaned?", o: ["At the end of the month", "Right after use", "Only when guests complain"], a: 1 },
+                    { q: "What should you do when giving change?", o: ["Hand it over without counting", "Let the guest count it alone", "Count it in front of the guest"], a: 2 },
+                    { q: "Which reports can be generated at the end of a shift?", o: ["Inventory, spoilage, void and sales", "Weather and traffic", "Hygiene and vacation"], a: 0 },
+                    { q: "Which items are monitored under par stock?", o: ["Only the cash tray", "Coffee beans, milk, sugar, bar supplies and flavored syrups", "Only the cups"], a: 1 }
+                  ] }
             ]},
             8: { modules: [
                 { title: "Marketing Foundations", lessons: [
@@ -1754,36 +2663,54 @@
             ]}
         };
         const courseTotal = (c) => c.modules.reduce((n, m) => n + m.lessons.length + 1, 0);
-        const courseCount = (pr) => ((pr && pr.done) || []).length + Object.keys((pr && pr.quiz) || {}).length;
+        // Progress saved against an older version of a course is ignored, so renumbered lessons never show as wrongly "done".
+        const courseCount = (pr, c) => (!pr || (c && c.v && pr.v !== c.v)) ? 0 : (pr.done || []).length + Object.keys(pr.quiz || {}).length;
+        const qsOf = (m) => Array.isArray(m.quiz) ? m.quiz : [m.quiz];
 
         const CourseView = ({ opp, user, prog, update, onBack, welcome }) => {
             const course = COURSES[opp.id];
-            const done = prog.done || [], quiz = prog.quiz || {};
+            const fresh = !course.v || prog.v === course.v;
+            const done = fresh ? (prog.done || []) : [], quiz = fresh ? (prog.quiz || {}) : {};
             const items = [];
             course.modules.forEach((m, mi) => { m.lessons.forEach((_, li) => items.push({ m: mi, l: li })); items.push({ m: mi, quiz: true }); });
             const isDone = (it) => it.quiz ? !!quiz[it.m] : done.includes(`${it.m}-${it.l}`);
             const unlocked = (it) => !it.quiz || course.modules[it.m].lessons.every((_, li) => done.includes(`${it.m}-${li}`));
             const [sel, setSel] = useState(() => items.find(i => !isDone(i)) || items[0]);
-            const [pick, setPick] = useState(null);
+            const [picks, setPicks] = useState({});
             useEffect(() => { lucide.createIcons(); });
-            const pct = Math.round(courseCount(prog) / courseTotal(course) * 100);
+            useEffect(() => { if (!fresh) update(() => ({ done: [], quiz: {}, v: course.v })); }, []);
+            const pct = Math.round(courseCount(prog, course) / courseTotal(course) * 100);
             const idx = items.findIndex(i => i.m === sel.m && i.l === sel.l && !!i.quiz === !!sel.quiz);
-            const goNext = () => { const n = items[idx + 1]; if (n) { setSel(n); setPick(null); } };
-            const open = (it) => { if (unlocked(it)) { setSel(it); setPick(null); } };
+            const goNext = () => { const n = items[idx + 1]; if (n) { setSel(n); setPicks({}); } };
+            const open = (it) => { if (unlocked(it)) { setSel(it); setPicks({}); } };
             const mod = course.modules[sel.m];
             const lesson = !sel.quiz && mod.lessons[sel.l];
-            const completeLesson = () => { update(p => ({ ...p, done: Array.from(new Set([...(p.done || []), `${sel.m}-${sel.l}`])) })); goNext(); };
-            const answer = (i) => { setPick(i); if (i === mod.quiz.a) update(p => ({ ...p, quiz: { ...(p.quiz || {}), [sel.m]: true } })); };
+            const qs = lesson ? [] : qsOf(mod);
+            const nCorrect = qs.filter((q, k) => picks[k] === q.a).length;
+            const passed = !lesson && (!!quiz[sel.m] || nCorrect === qs.length);
+            const completeLesson = () => { update(p => ({ ...p, v: course.v, done: Array.from(new Set([...(p.done || []), `${sel.m}-${sel.l}`])) })); goNext(); };
+            const answer = (qi, i) => {
+                const np = { ...picks, [qi]: i };
+                setPicks(np);
+                if (qs.every((q, k) => np[k] === q.a)) update(p => ({ ...p, v: course.v, quiz: { ...(p.quiz || {}), [sel.m]: true } }));
+            };
             return (
                 <div className="p-8 max-w-6xl mx-auto pt-28">
                     <button onClick={onBack} className="text-sm text-brand-blue font-semibold mb-4 flex items-center gap-1"><Icon name="arrow-left" className="w-4 h-4" /> All my courses</button>
                     {welcome && <div className="bg-green-50 border border-green-200 text-green-800 rounded-xl p-4 mb-4 text-sm">Application submitted! You're enrolled. Start your first module below. Your progress is saved automatically.</div>}
                     <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6 mb-6">
                         <p className="text-xs font-bold uppercase text-brand-blue">{opp.provider} · Online Course</p>
-                        <h2 className="text-2xl font-bold text-gray-900 mb-3">{opp.title}</h2>
-                        <div className="h-2 bg-gray-100 rounded-full overflow-hidden"><div className="h-full bg-brand-blue transition-all" style={{ width: pct + '%' }}></div></div>
+                        <h2 className="text-2xl font-bold text-gray-900 mb-1">{opp.title}</h2>
+                        {course.subtitle && <p className="text-sm text-gray-500 mb-3">{course.subtitle}</p>}
+                        <div className="h-2 bg-gray-100 rounded-full overflow-hidden mt-3"><div className="h-full bg-brand-blue transition-all" style={{ width: pct + '%' }}></div></div>
                         <p className="text-xs text-gray-500 mt-2">{pct}% complete</p>
                         {pct === 100 && <div className="mt-4 bg-yellow-50 border border-yellow-200 rounded-lg p-4 text-sm text-yellow-800 flex items-center gap-2"><Icon name="award" className="w-5 h-5" /> Congratulations, {user.name.split(' ')[0]}! You completed this course. Certificate of Completion, {opp.provider}.</div>}
+                        {course.about && (
+                            <details className="mt-4">
+                                <summary className="cursor-pointer text-sm font-semibold text-brand-blue">About this course &amp; learning tips</summary>
+                                <div className="mt-4 pt-4 border-t border-gray-100"><Blocks items={course.about} /></div>
+                            </details>
+                        )}
                     </div>
                     <div className="grid grid-cols-12 gap-6">
                         <div className="col-span-4 space-y-3">
@@ -1796,7 +2723,7 @@
                                         const ok = isDone(it), lock = !unlocked(it);
                                         return (
                                             <button key={k} onClick={() => open(it)} disabled={lock} className={`w-full text-left flex items-center gap-2 px-3 py-2 rounded-lg text-sm ${active ? 'bg-blue-50 text-brand-blue font-semibold' : 'text-gray-700 hover:bg-gray-50'} disabled:opacity-40`}>
-                                                <Icon name={ok ? 'check-circle' : lock ? 'lock' : it.quiz ? 'help-circle' : 'play-circle'} className={`w-4 h-4 ${ok ? 'text-green-600' : ''}`} />
+                                                <Icon name={ok ? 'check-circle' : lock ? 'lock' : it.quiz ? 'help-circle' : 'play-circle'} className={`w-4 h-4 shrink-0 ${ok ? 'text-green-600' : ''}`} />
                                                 <span className="truncate">{it.quiz ? 'Module Quiz' : m.lessons[it.l].title}</span>
                                             </button>
                                         );
@@ -1804,26 +2731,31 @@
                                 </div>
                             ))}
                         </div>
-                        <div className="col-span-8 bg-white rounded-xl border border-gray-100 shadow-sm p-8">
+                        <div className="col-span-8 bg-white rounded-xl border border-gray-100 shadow-sm p-8 min-w-0">
                             <p className="text-xs font-bold text-gray-400 uppercase mb-1">Module {sel.m + 1}: {mod.title}</p>
                             {lesson ? (
                                 <>
                                     <h3 className="text-xl font-bold text-gray-900 mb-1">{lesson.title}</h3>
-                                    <p className="text-xs text-gray-500 mb-4 flex items-center gap-1"><Icon name="clock" className="w-3 h-3" /> {lesson.mins} min read</p>
-                                    <p className="text-gray-700 leading-relaxed mb-6">{lesson.text}</p>
+                                    {lesson.mins > 0 && <p className="text-xs text-gray-500 mb-4 flex items-center gap-1"><Icon name="clock" className="w-3 h-3" /> {lesson.mins} {lesson.label || 'min read'}</p>}
+                                    <div className="mt-4 mb-6"><Blocks items={lesson.text} /></div>
                                     <button onClick={completeLesson} className="px-6 py-2.5 rounded-lg font-bold text-white bg-brand-blue hover:bg-blue-700">{done.includes(`${sel.m}-${sel.l}`) ? 'Continue' : 'Mark as Complete & Continue'}</button>
                                 </>
                             ) : (
                                 <>
-                                    <h3 className="text-xl font-bold text-gray-900 mb-4">Module Quiz</h3>
-                                    <p className="font-medium text-gray-800 mb-4">{mod.quiz.q}</p>
-                                    <div className="space-y-2 mb-4">
-                                        {mod.quiz.o.map((o, i) => (
-                                            <button key={i} onClick={() => answer(i)} className={`w-full text-left px-4 py-3 rounded-lg border text-sm ${pick === i ? (i === mod.quiz.a ? 'border-green-400 bg-green-50' : 'border-red-300 bg-red-50') : 'border-gray-200 hover:bg-gray-50'}`}>{o}</button>
-                                        ))}
-                                    </div>
-                                    {pick !== null && pick !== mod.quiz.a && <p className="text-sm text-red-600 mb-3">Not quite. Try another answer.</p>}
-                                    {(quiz[sel.m] || pick === mod.quiz.a) && <div><p className="text-sm text-green-700 mb-3">Correct! Module complete.</p>{items[idx + 1] && <button onClick={goNext} className="px-6 py-2.5 rounded-lg font-bold text-white bg-brand-blue hover:bg-blue-700">Next Module</button>}</div>}
+                                    <h3 className="text-xl font-bold text-gray-900 mb-2">Module Quiz</h3>
+                                    {qs.length > 1 && <p className="text-sm text-gray-500 mb-5">Answer all {qs.length} questions correctly to complete this module. {nCorrect} of {qs.length} correct so far.</p>}
+                                    {qs.map((q, qi) => (
+                                        <div key={qi} className="mb-6">
+                                            <p className="font-medium text-gray-800 mb-3">{qs.length > 1 ? `${qi + 1}. ` : ''}{q.q}</p>
+                                            <div className="space-y-2">
+                                                {q.o.map((o, i) => (
+                                                    <button key={i} onClick={() => answer(qi, i)} className={`w-full text-left px-4 py-3 rounded-lg border text-sm ${picks[qi] === i ? (i === q.a ? 'border-green-400 bg-green-50' : 'border-red-300 bg-red-50') : 'border-gray-200 hover:bg-gray-50'}`}>{o}</button>
+                                                ))}
+                                            </div>
+                                            {picks[qi] !== undefined && picks[qi] !== q.a && <p className="text-sm text-red-600 mt-2">Not quite. Try another answer.</p>}
+                                        </div>
+                                    ))}
+                                    {passed && <div><p className="text-sm text-green-700 mb-3">Correct! Module complete.</p>{items[idx + 1] && <button onClick={goNext} className="px-6 py-2.5 rounded-lg font-bold text-white bg-brand-blue hover:bg-blue-700">Next Module</button>}</div>}
                                 </>
                             )}
                         </div>
@@ -1848,7 +2780,7 @@
                         </div>
                     ) : (
                         <div className="grid grid-cols-3 gap-6">
-                            {enrolled.map(o => { const pct = Math.round(courseCount(progress[o.id]) / courseTotal(COURSES[o.id]) * 100); return (
+                            {enrolled.map(o => { const pct = Math.round(courseCount(progress[o.id], COURSES[o.id]) / courseTotal(COURSES[o.id]) * 100); return (
                                 <button key={o.id} onClick={() => setActiveId(o.id)} className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden text-left hover:shadow-md transition">
                                     <img src={o.image} alt="" className="h-32 w-full object-cover" />
                                     <div className="p-4"><p className="font-bold text-gray-900 mb-1 line-clamp-2">{o.title}</p><p className="text-xs text-gray-500 mb-3">{COURSES[o.id].modules.length} modules · {o.provider}</p>
@@ -1872,6 +2804,21 @@
             const [progress, setProgress] = useState({});
             const [activeCourse, setActiveCourse] = useState(null);
             const [justEnrolled, setJustEnrolled] = useState(false);
+            const [avatar, setAvatar] = useState(null);
+            useEffect(() => {
+                if (!user) { setAvatar(null); return; }
+                try { setAvatar(localStorage.getItem(`kc_avatar_${user.id}`) || null); } catch (e) { setAvatar(null); }
+            }, [user && user.id]);
+            // Returns false if the browser could not store the photo.
+            const changeAvatar = (data) => {
+                if (!user) return false;
+                try {
+                    if (data) localStorage.setItem(`kc_avatar_${user.id}`, data);
+                    else localStorage.removeItem(`kc_avatar_${user.id}`);
+                    setAvatar(data || null);
+                    return true;
+                } catch (e) { return false; }
+            };
             useEffect(() => {
                 if (!user) return;
                 try { setProgress(JSON.parse(localStorage.getItem(`kc_courses_${user.id}`) || '{}')); } catch (e) {}
@@ -1983,8 +2930,7 @@
                     case 'financial': return <FilteredOpportunitiesView filterType="Financial Literacy" title="Financial Literacy" subtitle="Learn how to manage your money better." onApply={setSelectedOpp} />;
                     case 'search': return <SearchResultsView query={searchQuery} onApply={setSelectedOpp} />;
                     case 'courses': return <CoursesView progress={progress} updateProgress={updateProgress} user={user} activeId={activeCourse} setActiveId={(id) => { setActiveCourse(id); setJustEnrolled(false); }} welcome={justEnrolled} onBrowse={() => navigate('training')} />;
-                    case 'messages': return <MessagesView />;
-                    case 'profile': return <ProfileView user={user} applications={applications} />;
+                    case 'profile': return <ProfileView user={user} applications={applications} avatar={avatar} onAvatarChange={changeAvatar} />;
                     default: return <DashboardView onApply={setSelectedOpp} user={user} />;
                 }
             }
@@ -2006,6 +2952,7 @@
                             onMarkAllRead={markAllRead}
                             onClearAll={clearAllNotifs}
                             onDismissNotif={dismissNotif}
+                            avatar={avatar}
                         />
                         {renderView()}
                     </div>
